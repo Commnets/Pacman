@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<Forms>
+  <Form id="1" name="pacmanall" file=".\forms\chompersprites.png" width="448" height="128" 
+    fSpacing="0" fMargin="0" fWidth="32" fHeight="32" aColor="255" nFrames="56"/>
+  <Form id="2" name="numbers" file=".\forms\NumbersLittle.png" width="320" height="34"
+    fSpacing="0" fMargin="0" fWidth="32" fHeight="34" aColor="255" nFrames="10"/>
+  <Form id="100" name="options" file=".\forms\Options.png" width="193" height="34"
+    fSpacing="0" fMargin="0" fWidth="193" fHeight="34" aColor="255" nFrames="1"/>
+  <Form id="101" name="scores" file=".\forms\Scores.png" width="177" height="34"
+    fSpacing="0" fMargin="0" fWidth="177" fHeight="34" aColor="255" nFrames="1"/>
+  <Form id="102" name="play" file=".\forms\PlayGame.png" width="343" height="34"
+    fSpacing="0" fMargin="0" fWidth="343" fHeight="34" aColor="255" nFrames="1"/>
+  <Form id="103" name="exit" file=".\forms\Exit.png" width="107" height="34"
+    fSpacing="0" fMargin="0" fWidth="107" fHeight="34" aColor="255" nFrames="1"/>
+  <Form id="104" name="ready" file=".\forms\Ready.png" width="157" height="34"
+    fSpacing="0" fMargin="0" fWidth="157" fHeight="34" aColor="255" nFrames="1"/>
+</Forms>
