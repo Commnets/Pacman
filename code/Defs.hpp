@@ -83,6 +83,7 @@
 #define __PLAYGAMEFORM				102
 #define __EXITFORM					103
 #define __READYFORM					104
+#define __LETTERSFORM				105
 
 // Define the forms having the tiles...
 #define __MAZEFORM					10000
