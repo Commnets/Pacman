@@ -8,9 +8,7 @@
 class WorldPacman : public QGAMES::World
 {
 	public:
-	WorldPacman (const QGAMES::Scenes& s, const QGAMES::WorldProperties& p)
-		: QGAMES::World (__WORLDPACMAN, s, p)
-							{ }
+	WorldPacman (const QGAMES::Scenes& s, const QGAMES::WorldProperties& p);
 
 	QGAMES::Position monsterPenPosition () const;
 	QGAMES::Position initialPacmanPosition () const;
@@ -19,6 +17,19 @@ class WorldPacman : public QGAMES::World
 	virtual void initialize ();
 
 	virtual void processEvent (const QGAMES::Event& e);
+
+	private:
+	// Define a set of important buoys..
+	/** Define a buoy to finihses the maze. */
+	class ToCleanMazeBuoy : public QGAMES::Buoy
+	{
+		public:
+		ToCleanMazeBuoy ()
+			: QGAMES::Buoy (__MAZECLEANBOUYID, __BD 0)
+							{ }
+
+		virtual void* treatFor (QGAMES::Element* e);
+	};
 };
 
 #endif

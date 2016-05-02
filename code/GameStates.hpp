@@ -12,26 +12,69 @@ class Pinky;
 class Inky;
 class Clyde;
 
+/** A class to define text drawn during the presentation. */
+class PacmanPresentationText : public QGAMES::ScoreObjectText
+{
+	public:
+	PacmanPresentationText (const std::string& t = std::string (__NULL_STRING__));
+
+	virtual Entity* clone ()
+							{ return (new PacmanPresentationText (_text)); }
+
+	protected:
+	/** @see parent. */
+	virtual int formToDrawLetters ()
+							{ return (__LETTERSFORM); }
+};
+
+/** When the game is loading. */
+class PacmanGameStateLoading : public QGAMES::GameState 
+{
+	public:
+	PacmanGameStateLoading (QGAMES::Game* g)
+		: QGAMES::GameState (__GAMESTATELOADING, g),
+		  _counter (0),
+		  _background (NULL),
+		  _logo (NULL),
+		  _text (NULL),
+		  _fadeOut (false),
+		  _counterAlpha (255)
+							{ }
+
+	/** @see parent. */
+	void onEnter ();
+	void updatePositions ();
+	void drawOn (QGAMES::Screen* s);
+	void onExit ();
+
+	private:
+	/** To count how long the logo is in the screen... */
+	int _counter; 
+	/** The background to be shown. */
+	QGAMES::Form* _background;
+	/** The logo to be shown... */
+	QGAMES::Form* _logo; 
+	/** The text refering to the author. */
+	PacmanPresentationText* _text;
+	/** The logo start to fade out after a couple of seconds.. */
+	bool _fadeOut; 
+	/** The level of fade out... */
+	int _counterAlpha; 
+};
+
 /** This class represents the state at the beginning of the game.
 	It is the state to select options, to see scores,... */
 class GameStateInitial : public QGAMES::GameState 
 {
 	public:
-	GameStateInitial (QGAMES::Game* g)
-		: QGAMES::GameState (__GAMESSTATEINITIAL, g),
-		  _options (),
-		  _blinky (NULL),
-		  _counter (0),
-		  _optionHighlighted (0),
-		  _aWorld (NULL)
-						{ }
+	GameStateInitial (QGAMES::Game* g);
 
-	/** Moving the cursor (blinky) to the next option. */
 	void nextOption ();
-	/** Moving the cursor (blinky) to the previous option. */
 	void previousOption ();
-	/** An option has been selected. */
+	bool isMovingToAnOption () const
+							{ return (_movingToOption != 0); }
 	void optionSelected ();
+	void optionAt (const QGAMES::Position& pos);
 
 	virtual void onEnter ();
 	virtual void updatePositions ();
@@ -39,13 +82,42 @@ class GameStateInitial : public QGAMES::GameState
 	virtual void onExit ();
 
 	private:
-	Blinky* _blinky;
-	std::vector <QGAMES::Form*> _options;
-	QGAMES::World* _aWorld;
 
-	// Implementatation
-	int _counter;
-	int _optionHighlighted;
+	// Implementation
+	/** Blinky is part of the selection. */
+	Blinky* _blinky;
+	/** The background to be shown. */
+	QGAMES::Form* _background;
+	/** The logo form, shown in this state */
+	QGAMES::Form* _logo; 
+	/** The options to be selected. */
+	std::vector <std::string> _options;
+	/** The levels potentially selected. */
+	std::vector <std::string> _optionLevels;
+	/** ...and the entites representing them. */
+	std::vector <PacmanPresentationText*> _optionGraphics;
+	/** The current option selected. */
+	int _currentOption;
+	/** The current option related with the level. */
+	int _currentOptionLevel;
+	/** Counter for the things moving... */
+	int _counterMovement;
+	/** The selection moves little by little.
+		This parameters marks how much is it moving. */
+	int _positionOption;
+	/** To indicate the type of movement. */
+	int _movingToOption;
+	/** The figure that is being shown. */
+	int _figure;
+	/** The type of control selected: 0 keyboard, 1 joystick. */
+	int _typeOfControl;
+	/** Blinking attribute. */
+	int _blinkAttr;
+	/** Direction of the blinking. */
+	int _blinkDirection;
+	/** When the input handler detects an special key has been pressed
+		and the game stands in this state this variable is set to true. */
+	bool _wantToExit;
 };
 
 /** This class represents the state before the game starts.

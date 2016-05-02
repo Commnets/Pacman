@@ -94,6 +94,7 @@
     <ClInclude Include="MapsBuilder.hpp" />
     <ClInclude Include="Movements.hpp" />
     <ClInclude Include="MovementsBuilder.hpp" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Scenes.hpp" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -137,6 +138,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="forms\chompersprites.png" />
+    <Image Include="forms\pacmanico.ico" />
     <Image Include="maps\chompermazetiles.png" />
   </ItemGroup>
   <ItemGroup>
@@ -151,6 +153,9 @@
     <Media Include="sounds\pacman_eatghost.wav" />
     <Media Include="sounds\pacman_extrapac.wav" />
     <Media Include="sounds\pacman_intermission.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="PacMan.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

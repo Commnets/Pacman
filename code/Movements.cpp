@@ -60,7 +60,7 @@ void PacmanEntityMovement::move (const QGAMES::Vector& d, const QGAMES::Vector& 
 		// or it must stop because it reaches
 		bool contMove = true;
 		for (_counterTSpeed = (int) (vel / __BASESPEED); 
-			_counterTSpeed > 0; _counterTSpeed--)
+			_counterTSpeed > 0 && contMove; _counterTSpeed--)
 		{
 			moveOne (d, a, e); // Any time, it moves only one...
 			if (!((PacmanArtist*) e) -> continueMoving ())
@@ -77,23 +77,20 @@ void PacmanEntityMovement::move (const QGAMES::Vector& d, const QGAMES::Vector& 
 		// it can only move one pixel more maximum...
 		if ((vel % __BASESPEED) != 0)
 		{
-			++_counterMSpeed[0];
-			if (_counterMSpeed[0] == (int) ((__BASESPEED / (vel % __BASESPEED))))
+			if (_counterMSpeed[0]++ == (int) ((__BASESPEED / (vel % __BASESPEED))))
 			{
 				_counterMSpeed[0] = 0;
 				if ((__BASESPEED % (vel % __BASESPEED)) != 0)
 				{
-					++_counterMSpeed[1];
-					if (_counterMSpeed[1] == 
+					if (_counterMSpeed[1]++ == 
 						((vel % __BASESPEED) / (__BASESPEED % (vel % __BASESPEED))))
-					{
-						_counterMSpeed[1];
-						moveOne (d, a, e); // Any time, it moves only one...
-					}
+						_counterMSpeed[1] = 0;
+					else
+						moveOne (d, a, e);
 				}
-				else
-					moveOne (d, a, e); // Any time, it moves only one...
 			}
+			else
+				moveOne (d, a, e); // Any time, it moves only one...
 		}
 	}
 
@@ -102,21 +99,18 @@ void PacmanEntityMovement::move (const QGAMES::Vector& d, const QGAMES::Vector& 
 	// it moves only one pixel...
 	else
 	{
-		++_counterMSpeed[0];
-		if (_counterMSpeed[0] == (int) ((__BASESPEED / (vel % __BASESPEED))))
+		if (_counterMSpeed[0]++ == (int) ((__BASESPEED / (vel % __BASESPEED))))
 		{
 			_counterMSpeed[0] = 0;
+			moveOne (d, a, e); // Any time it moves only one...
 			if ((__BASESPEED % (vel % __BASESPEED)) != 0)
 			{
-				++_counterMSpeed[1];
-				if (_counterMSpeed[1] < 
+				if (_counterMSpeed[1]++ < 
 					((vel % __BASESPEED) / (__BASESPEED % (vel % __BASESPEED))))
 					moveOne (d, a, e); // Any time, it moves only one...
 				else
 					_counterMSpeed[1] = 0;
 			}
-			else
-				moveOne (d, a, e); // Any time it moves only one...
 		}
 	}
 }
@@ -402,7 +396,7 @@ void MovementInTheMaze::changeMovementTo (const QGAMES::Vector& d, QGAMES::Entit
 			((QGAMES::bdata) m -> tileWidth () * d));
 		
 		_numberSteps = 0;
-		if (t -> type () != __TILEMAZE)
+		if (t && t -> type () != __TILEMAZE)
 		{
 			_moving = true; // It can move...
 			_directionMovement = d; 

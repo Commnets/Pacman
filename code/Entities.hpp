@@ -90,16 +90,7 @@ class PacmanMonster : public PacmanArtist
 	};
 
 	PacmanMonster (int id, const QGAMES::Forms& f = QGAMES::Forms (), 
-		const QGAMES::Entity::Data& d = QGAMES::Entity::Data ())
-			: PacmanArtist (id, f, d),
-			  _pacman (NULL),
-			  _mode (_CHASE),
-			  _collegues (),
-			  _counterScatter (0),
-			  _counterChase (0),
-			  _counterCycle (0),
-			  _lastSpeed (__BD 0)
-							{ }
+		const QGAMES::Entity::Data& d = QGAMES::Entity::Data ());
 
 	void setCollegues (const PacmanMonsters& m)
 							{ _collegues = m; }
@@ -120,6 +111,9 @@ class PacmanMonster : public PacmanArtist
 
 	virtual void initialize ();
 	virtual void updatePositions ();
+	virtual void drawOn (QGAMES::Screen* s, 
+		const QGAMES::Position& p = QGAMES::Position::_noPoint);
+
 	virtual void setMove (const QGAMES::Vector& d, 
 		const QGAMES::Vector& a = QGAMES::Vector (__BD  0, __BD 0, __BD 0))
 							{ _direction = nextMove (); _acceleration = a; }
@@ -127,7 +121,7 @@ class PacmanMonster : public PacmanArtist
 	virtual void whenCollisionWith (QGAMES::Tile* t, QGAMES::TileLayer* l = NULL);
 
 	protected:
-	QGAMES::Vector nextMove () const;
+	QGAMES::Vector nextMove ();
 	/** There is a basic way to define the aspect of a monster,
 		but in the case of the monster this way can be different depending on the state 
 		of the monster itself (died or alive...) */
@@ -147,6 +141,7 @@ class PacmanMonster : public PacmanArtist
 	int _counterCycle;
 	int _counterPanic;
 	QGAMES::bdata _lastSpeed;
+	QGAMES::Position _whereToGo;
 };
 
 /** Finally: Pacman. */

@@ -1,7 +1,19 @@
 #include "Worlds.hpp"
 #include "Scenes.hpp"
+#include "Game.hpp"
 #include <Arcade/arcadegame.hpp>
 #include <Arcade/artist.hpp>
+
+// ---
+WorldPacman::WorldPacman (const QGAMES::Scenes& s, const QGAMES::WorldProperties& p)
+		: QGAMES::World (__WORLDPACMAN, s, p)
+{
+	QGAMES::Buoys lB;
+	lB.insert (QGAMES::Buoys::value_type 
+		(__MAZECLEANBOUYID, new WorldPacman::ToCleanMazeBuoy));
+	setBuoys (lB);
+
+}
 
 // ---
 QGAMES::Position WorldPacman::monsterPenPosition () const
@@ -60,5 +72,14 @@ void WorldPacman::processEvent (const QGAMES::Event& e)
 {
 	QGAMES::World::processEvent (e);
 	if (e.code () == __MAZECLEAN)
-		notify (e);
+		buoy (__MAZECLEANBOUYID) -> active (true);
 }
+
+// ---
+void* WorldPacman::ToCleanMazeBuoy::treatFor (QGAMES::Element* e)
+{
+	assert (e);
+	((WorldPacman*) e) -> game () -> setState (__GAMESTATEMAZECLEANNAME);
+	return (this);
+}
+

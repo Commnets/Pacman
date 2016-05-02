@@ -2,100 +2,325 @@
 #include "Game.hpp"
 #include "Entities.hpp"
 #include "General.hpp"
+#include "InputHandler.hpp"
+
+// ---
+PacmanPresentationText::PacmanPresentationText (const std::string& t)
+		: QGAMES::ScoreObjectText (0, t, QGAMES::Forms (), 0)
+{
+	_forms.insert (QGAMES::Forms::value_type (__LETTERSFORM, 
+		QGAMES::Game::game () -> form (__LETTERSFORM)));
+	setText (t);
+}
+
+// ---
+void PacmanGameStateLoading::onEnter ()
+{
+	// The counter to control how long the 
+	// screen is a loading mode...
+	_counter = 0;
+	// The background used during this state
+	_background = _game -> form (__BACKGROUNDINITIALFORM);
+	// The logo used during this state...
+	_logo = _game -> form (__COMMTYLOGOFORM);
+	// The text used...
+	_text = new PacmanPresentationText (std::string ("2016 IGNACIO CEA"));
+	_text -> setSpace (-5); // Letters are tight!!
+	// Not fadding 
+	_fadeOut = false;
+	// The counter for alpha channel to the begging...
+	_counterAlpha = 255;
+
+	// There is no active world...so far
+	(__AGM _game) -> setWorld (__MININT__);
+	// There is no score objects...
+	(__AGM _game) -> removeScoreObjects ();
+}
+
+// ---
+void PacmanGameStateLoading::updatePositions ()
+{
+	// Two seconds in this state...
+	// Before fading the title out...
+	if (_counter++ > (2 * _game -> framesPerSecond ()))
+		_fadeOut = true;
+
+	// If fadding out...
+	if (_fadeOut)
+	{
+		// No more than 10 seconds...
+		if (_counter++ > (10 * _game -> framesPerSecond ())) 
+			_game -> setState (std::string (__GAMESTATEINITIALNAME));
+
+		// ...or until dissapear...
+		_counterAlpha = _counterAlpha - 2; 
+		if (_counterAlpha < 0)
+			_game -> setState (std::string (__GAMESTATEINITIALNAME));
+	}
+}
+
+// ---
+void PacmanGameStateLoading::drawOn (QGAMES::Screen* s)
+{
+	// Display the background...a very scared one!
+	_background -> drawOn (s, 0, QGAMES::Position::_cero, 100);
+	// During this state the logo of Ceasoftware is displayed at the bootm
+	QGAMES::Position lPos = QGAMES::Position 
+		(__BD 10, __BD (__SCREENHEIGHT__ - _logo -> frameHeight () - 10), __BD 0); 
+	_logo -> drawOn (s, 0, lPos, _counterAlpha);
+	// Write down the text, next to the logo...
+	_text -> setAlphaLevel (_counterAlpha);
+	_text -> drawOn (s, lPos + QGAMES::Position (__BD (_logo -> frameWidth () + 10), 
+		__BD (((_logo -> frameHeight () - _text -> height ()) / 2) + 10), __BD 0));
+}
+
+// ---
+void PacmanGameStateLoading::onExit ()
+{
+	delete _text;
+}
+
+// ---
+GameStateInitial::GameStateInitial (QGAMES::Game* g)
+	: QGAMES::GameState (__GAMESTATEINITIAL, g),
+	  _blinky (NULL),
+	  _background (NULL),
+	  _logo (NULL),
+	  _options (),
+	  _optionLevels (),
+	  _optionGraphics (),
+	  _currentOption (0),
+	  _currentOptionLevel (0),
+	  _counterMovement (0),
+	  _positionOption (0),
+	  _movingToOption (0),
+	  _figure (0),
+	  _typeOfControl (0),
+	  _blinkAttr (50),
+	  _blinkDirection (2),
+	  _wantToExit (false)
+{
+	// Nothing else to do so far...
+}
 
 // ---
 void GameStateInitial::nextOption ()
 {
-	if (_optionHighlighted < 3)
-		_optionHighlighted++;
+	if (_movingToOption != 0)
+		return;
+	if (_currentOption < (__NUMBEROPTIONS - 1))
+		_movingToOption = 1;
 }
 
 // ---
 void GameStateInitial::previousOption ()
 {
-	if (_optionHighlighted > 0)
-		_optionHighlighted--;
+	if (_movingToOption != 0)
+		return;
+	if (_currentOption > 0)
+		_movingToOption = -1;
 }
 
 // ---
 void GameStateInitial::optionSelected ()
 {
-	if (_optionHighlighted == 2)
+	if (_movingToOption != 0)
+		return;
+
+	if (_currentOption == 0)
+		_typeOfControl = 0;
+	if (_currentOption == 1)
+		_typeOfControl = 1;
+	if (_currentOption == 2)
+		{ } // Nothing to do so far...
+
+	if (_currentOption == 3)
 	{
-		((PacmanGame*) _game) -> setWorld (__WORLDPACMAN);
-		((PacmanGame*) _game) -> activeWorld () -> initialize ();
-		((PacmanGame*) _game) -> observe (((PacmanGame*) _game) -> activeWorld ());
-		_game -> setState (__GAMESTATEPRELUDENAME);
+		if (++_currentOptionLevel >= __MAXNUMBEROFDIFFICULTYLEVELS)
+			_currentOptionLevel = 0;
+		_options [3] = _optionLevels [_currentOptionLevel];
+		delete _optionGraphics [3];
+		_optionGraphics [3] = new PacmanPresentationText (_options [3]);
+		_optionGraphics [3] -> setSpace (0);
 	}
 
-	if (_optionHighlighted == 3)
-		_game -> exitGame ();
+	if (_currentOption == 4)
+		_wantToExit = true;
 }
 
 // ---
+void GameStateInitial::optionAt (const QGAMES::Position& pos)
+{
+	QGAMES::Position oPos (__BD (__SCREENWIDTH__ - 500), __BD 40, __BD 0);
+	for (int i = 0; i < __NUMBEROPTIONS; i++)
+	{
+		QGAMES::Position p1C = oPos + 
+			(__BD (i * 60) * QGAMES::Vector (__BD 0, __BD 1, __BD 0));
+		QGAMES::Position p2C = p1C + QGAMES::Vector (__BD 350, __BD 54, __BD 0);
+		QGAMES::Rectangle rOpt (p1C, p2C);
+		if (rOpt.hasIn (pos))
+			_currentOption = i;
+	}
+}
+// ---
 void GameStateInitial::onEnter ()
 {
-	// The score objects are not valid in this stage...
-	_game -> removeScoreObjects ();
-
-	// Entering, there is not still world alive...
-	// Just to avoid entities to be managed by the main game loop...
-	_aWorld = ((PacmanGame*) _game) -> activeWorld (); // It will be reestablished later on...
-	((PacmanGame*) _game) -> setWorld (__MININT__);
-
-	// Fix the screen atthe beginning...
-	_game -> mainScreen () -> setPosition (QGAMES::Vector::_cero);
-
-	// Create an array with the forms...
-	_options.clear ();
-	_options.resize (4);
-	_options [0] = _game -> form (__OPTIONSFORM);
-	_options [1] = _game -> form (__SCORESFORM);
-	_options [2] = _game -> form (__PLAYGAMEFORM);
-	_options [3] = _game -> form (__EXITFORM);
+	// The background used during this state
+	_background = _game -> form (__BACKGROUNDINITIALFORM);
+	// ...and the logo used during this state...
+	_logo = _game -> form (__COMMTYLOGOFORM);
 
 	// Blinky is the selector
 	_blinky = (Blinky*) ((PacmanGame*) _game) -> entity (__ENTITYBLINKY);
 	_blinky -> setCurrentForm (__SPRITESFORM);
 	_blinky -> setCurrentAspect (__BLINKYRIGHTMINFRAME);
 	_blinky -> setPosition (QGAMES::Position (__BD 50, 
-		__BD (150 + (_optionHighlighted * 75)), __BD 0));
+		__BD (150 + (_currentOption * 75)), __BD 0));
+
+	// Define the options related with the level...
+	_optionLevels.resize (__MAXNUMBEROFDIFFICULTYLEVELS);
+	_optionLevels [0] = std::string ("EASY");
+	_optionLevels [1] = std::string ("NORMAL");
+	_optionLevels [2] = std::string ("DIFFICULT");
+
+	// Define the options...
+	_options.resize (__NUMBEROPTIONS);
+	_options [0] = std::string ("KEYBOARD");
+	_options [1] = std::string ("JOYSTICK");
+	_options [2] = std::string ("SCORES");
+	_options [3] = _optionLevels [_currentOptionLevel];
+	_options [4] = std::string ("START GAME");
+
+	// ...and the equivalent graphics...
+	_optionGraphics.resize (__NUMBEROPTIONS);
+	for (int i = 0; i < __NUMBEROPTIONS; i++)
+	{
+		_optionGraphics [i] = new PacmanPresentationText (_options [i]);
+		_optionGraphics [i] -> setSpace (0);
+	}
+
+	// It doesn't want to exit...so far
+	_wantToExit = false;
+	// The counter movement is set to 0
+	_counterMovement = 0;
+	// No movement to none option...
+	_movingToOption = 0;
+	// No counter in place to execute the movement
+	_positionOption = 0;
+	// Type of control selected: Keyboard or Joystick?
+	// First time it will be keyboard, but after first game who knows?
+	_typeOfControl = ((InputHandler*) _game -> inputHandler ()) -> isJoystickActive () ? 1 : 0; 
+	// Blinking attribute
+	_blinkAttr = 50;
+	// The dircetion is up...
+	_blinkDirection = 2;
+
+	// The score objects are not valid in this stage...
+	_game -> removeScoreObjects ();
+	// No world so far...
+	((PacmanGame*) _game) -> setWorld (__MININT__);
+	// Fix the screen atthe beginning...
+	_game -> mainScreen () -> setPosition (QGAMES::Vector::_cero);
 }
 
 // ---
 void GameStateInitial::updatePositions ()
 {
-	// Two times per second...
-	// Totally relaxed..the music is sound...no problems in mind...yet!
-	if (_counter++ >= (_game -> framesPerSecond () / 2)) 
+	// The things move...
+	if (++_counterMovement > 6)
 	{
-		_counter = 0;
-		_blinky -> setPosition (QGAMES::Position (__BD 50, 
-			__BD (150 + (_optionHighlighted * 75)), __BD 0));
-		_blinky -> setCurrentAspect ((_blinky -> currentAspect () == __BLINKYRIGHTMAXFRAME)
-			? __BLINKYRIGHTMINFRAME : _blinky -> currentAspect () + 1);
+		_counterMovement = 0;
+		if (++_figure > 1) // Blinky has only one aspect...
+			_figure = 0;
 	}
+
+	// Moves the rectangle around the option...
+	if (_movingToOption != 0)
+	{
+		_positionOption += 4;
+		if (_positionOption > 60)
+		{
+			_positionOption = 0;
+			if (_movingToOption == 1)
+				_currentOption++;
+			else
+				_currentOption--;
+			_movingToOption = 0;
+		}
+	}
+
+	// Blinks...
+	_blinkAttr += _blinkDirection;
+	if (_blinkAttr > 150) _blinkAttr = 150;
+	if (_blinkAttr < 50) _blinkAttr = 50;
+	if (_blinkAttr == 150 || _blinkAttr == 50)
+		_blinkDirection *= -1;
+
+	// if the right key has been selected,
+	// It is time to move to the next state...
+	if (_wantToExit)
+		_game -> setState (__GAMESTATEPRELUDENAME);
 }
 
 // ---
 void GameStateInitial::drawOn (QGAMES::Screen* s)
 {
-	QGAMES::Screen* scr = _game -> mainScreen ();
-	for (int i = 0; i < 4; i++)
-		_options [i] -> drawOn (s, 0, 
-			QGAMES::Position (__BD ((scr -> visualWidth () - _options [i] -> width ()) / 2), 
-				__BD (150 + (i * 75)), __BD 0));
+	// Draw the background and the logo...
+	_background -> drawOn (s, 0, QGAMES::Position::_cero, 100); // A little bit fade - out!
+	QGAMES::Position lPos = QGAMES::Position 
+		(__BD 10, __BD (__SCREENHEIGHT__ - _logo -> frameHeight () - 10), __BD 0); 
+	_logo -> drawOn (s, 0, lPos);
 
+	// The original position of the options..
+	QGAMES::Position oPos (__BD (__SCREENWIDTH__ - 500), __BD 40, __BD 0);
+
+	// Draws a full rectangle around the current options selected
+	// The color of the rectangle is gray...
+	QGAMES::Position p1A = oPos + 
+		(__BD ((_typeOfControl == 0) ? 0 : 1) * 60) * QGAMES::Vector (__BD 0, __BD 1, __BD 0);
+	QGAMES::Position p2A = p1A + QGAMES::Vector (__BD 450, __BD 60, __BD 0);
+	s -> drawRectangle (QGAMES::Rectangle (p1A, p2A), QGAMES::Color (_blinkAttr, _blinkAttr, _blinkAttr), true);
+	s -> drawRectangle (QGAMES::Rectangle (p1A, p2A), QGAMES::Color (255, 255, 255));
+
+	// Draws the options...
+	for (int i = 0; i < __NUMBEROPTIONS; i++)
+	{
+		QGAMES::Vector aPos (__BD 0, __BD (i * 60), __BD 0);
+		_optionGraphics [i] -> 
+			drawOn (s, oPos + aPos + QGAMES::Vector (__BD 60, __BD 10, __BD 0));
+	}
+	
+	// Draws a while rectangle around the selected option...
+	QGAMES::Position p1C = oPos + 
+		(__BD (_currentOption * 60) * QGAMES::Vector (__BD 0, __BD 1, __BD 0)) + 
+			(__BD _movingToOption * QGAMES::Vector (__BD 0, __BD _positionOption, __BD 0));
+	QGAMES::Position p2C = p1C + QGAMES::Vector (__BD 450, __BD 60, __BD 0);
+	s -> drawRectangle (QGAMES::Rectangle (p1C, p2C), QGAMES::Color (255,255,255), false);
+
+	// Draws blinky...
+	_blinky -> setPosition (QGAMES::Position (__BD 50, 
+		__BD (50 + (_currentOption * 60)), __BD 0));
+	_blinky -> setCurrentAspect (__BLINKYRIGHTMINFRAME + _figure);
 	_blinky -> drawOn (s);
 }
 
 // ---
 void GameStateInitial::onExit ()
 {
-	// Reestablish the world...
-	// so the arcade game takes back the control of the game
-	if (_aWorld)
-		((PacmanGame*) _game) -> setWorld (_aWorld -> id ());
+	// Deletes all the reserved things...
+	for (int i = 0; i < __NUMBEROPTIONS; i++)
+		delete (_optionGraphics [i]);
+	_options.clear ();
+	_optionGraphics.clear ();
+
+	// It is time to select the level...
+	((PacmanGame*) _game) -> setLevel (_currentOptionLevel * 10);
+	// Select the type of control: joystick or keyboard?
+	((PacmanGame*) _game) -> setJoystick ((_typeOfControl == 0) ? false : true);
+
+	// Stablishes the world and the things around it...
+	((PacmanGame*) _game) -> setWorld (__WORLDPACMAN);
+	((PacmanGame*) _game) -> activeWorld () -> initialize ();
 }
 
 // ---
@@ -246,7 +471,10 @@ void GameStatePrelude::onExit ()
 	// so the arcade game takes back the control of the game
 	((PacmanGame*) _game) -> setWorld (_aWorld -> id ());
 	// Fix the number of lives...
-	((PacmanGame*) _game) -> setLives (_MAXNUMBEROFLIVES);
+	((PacmanGame*) _game) -> setLives (__MAXNUMBEROFLIVES__);
+	// Stop the music just in case...
+	// If the user leaves the game enough time the music finishes by itself...
+	_game -> sound (__SOUNDBEGINNING) -> stop ();
 }
 
 // ---

@@ -7,6 +7,7 @@
 #include "Maps.hpp"
 #include "WorldsBuilder.hpp"
 #include "GameStates.hpp"
+#include "InputHandler.hpp"
 #include "General.hpp"
 #include "Defs.hpp"
 #include <SDL/sdlformbuilder.hpp>
@@ -44,7 +45,7 @@ void PacmanGame::processEvent (const QGAMES::Event& e)
 	if (e.code () == __SUPERBALLEATED)
 		superBallEated ((QGAMES::Tile*) e.data ());
 	if (e.code () == __MAZECLEAN)
-		mazeClean ((QGAMES::Map*) e.data ());
+		mazeClean ((QGAMES::Map*) e.data ()); // This event is not received here eventually...it is treated at World level
 	if (e.code () == __ENTERPORTAL1)
 		moveArtistToPortal (__PORTALGATE2, (PacmanArtist*) e.data ());
 	if (e.code () == __ENTERPORTAL2)
@@ -104,16 +105,28 @@ void PacmanGame::setLevel (int l)
 
 	// The speed of the monsters depends on the level...
 	// The speed of the pacman also depends on the level...
-	_pacman -> setSpeed ((int) (floor ((__BASESPEED * __PERCENTSPEED * 
-			General::_e._variables [_level][__VARPACMANSPEED]) + 0.5)));
-	_blinky -> setSpeed ((int) (floor ((__BASESPEED * __PERCENTSPEED * 
-			General::_e._variables [_level][__VARGHOSTSPEED]) + 0.5)));
-	_pinky -> setSpeed ((int) (floor ((__BASESPEED * __PERCENTSPEED * 
-			General::_e._variables [_level][__VARGHOSTSPEED]) + 0.5)));
-	_inky -> setSpeed ((int) (floor ((__BASESPEED * __PERCENTSPEED * 
-			General::_e._variables [_level][__VARGHOSTSPEED]) + 0.5)));
-	_clyde -> setSpeed ((int) (floor ((__BASESPEED * __PERCENTSPEED * 
-			General::_e._variables [_level][__VARGHOSTSPEED]) + 0.5)));
+	_pacman -> setSpeed ((int) (__BASESPEED * __PERCENTSPEED * 
+			General::_e._variables [_level][__VARPACMANSPEED]));
+	_blinky -> setSpeed ((int) (__BASESPEED * __PERCENTSPEED * 
+			General::_e._variables [_level][__VARGHOSTSPEED]));
+	_pinky -> setSpeed ((int) (__BASESPEED * __PERCENTSPEED * 
+			General::_e._variables [_level][__VARGHOSTSPEED]));
+	_inky -> setSpeed ((int) (__BASESPEED * __PERCENTSPEED * 
+			General::_e._variables [_level][__VARGHOSTSPEED]));
+	_clyde -> setSpeed ((int) (__BASESPEED * __PERCENTSPEED * 
+			General::_e._variables [_level][__VARGHOSTSPEED]));
+/*	_pacman -> setSpeed (30);
+	_blinky -> setSpeed (20);
+	_pinky -> setSpeed (20);
+	_inky -> setSpeed (20);
+	_clyde -> setSpeed (20);^*/
+}
+
+// ---
+void PacmanGame::setJoystick (bool j)
+{
+	assert (_inputHandler);
+	((InputHandler*) _inputHandler) -> activateJoystick (j);
 }
 
 // ---
@@ -176,9 +189,9 @@ QGAMES::Timer* PacmanGame::createTimer ()
 QGAMES::Screens PacmanGame::createScreens ()
 { 
 	QGAMES::Screens r;
-	r.insert (QGAMES::Screens::value_type 
-		(__QGAMES_MAINSCREEN__, new SDLScreen (__GAMESNAME__, 
-		 QGAMES::Position (0,0), __SCREENWIDTH__, __SCREENHEIGHT__, __SCREENXPOS__, __SCREENYPOS__)));
+	QGAMES::Screen* scr = new SDLScreen (__GAMESNAME__, 
+		 QGAMES::Position (0,0), __SCREENWIDTH__, __SCREENHEIGHT__, __SCREENXPOS__, __SCREENYPOS__);
+	r.insert (QGAMES::Screens::value_type (__QGAMES_MAINSCREEN__, scr));
 	return (r); 
 }
 
@@ -200,6 +213,9 @@ QGAMES::MapBuilder* PacmanGame::createMapBuilder ()
 void PacmanGame::initialize ()
 {
 	QGAMES::ArcadeGame::initialize ();
+
+	// Sets the icon to the window...
+	mainScreen () -> setIcon (formBuilder () -> form (__PACMANICOFORM));
 
 	// Clean up everything...
 	_artists.clear ();
@@ -244,6 +260,8 @@ void PacmanGame::initialize ()
 
 	// Load the states...
 	_gameStates.insert (QGAMES::GameStates::value_type 
+		(std::string (__GAMESTATELOADINGNAME), new PacmanGameStateLoading (this)));
+	_gameStates.insert (QGAMES::GameStates::value_type 
 		(std::string (__GAMESTATEINITIALNAME), new GameStateInitial (this)));
 	_gameStates.insert (QGAMES::GameStates::value_type 
 		(std::string (__GAMESTATEPRELUDENAME), new GameStatePrelude (this)));
@@ -261,7 +279,7 @@ void PacmanGame::initialize ()
 		(std::string (__GAMESTATEENDNAME), new GameStateEnd (this)));
 
 	// The initial state...
-	setState (std::string (__GAMESTATEINITIALNAME));
+	setState (std::string (__GAMESTATELOADINGNAME));
 
 	// Load the world...
 	_worlds.insert (QGAMES::Worlds::value_type (__WORLDPACMAN,
@@ -389,7 +407,8 @@ void PacmanGame::detectCollisions ()
 		// of the tile occupied by the other...
 		if (dx < lx && dy < ly)
 		{
-			if (_mode == PacmanGame::_NORMAL)
+			if (_mode == PacmanGame::_NORMAL && 
+				(*i) -> state () != PacmanMonster::_DIE) // ...and the monster is still alive...
 			{
 				eatenByAMonster ((*i));
 				eatenFound = true; // When the first is found...nothing else matters...
@@ -466,7 +485,7 @@ void PacmanGame::moveArtistToPortal (int p, PacmanArtist* a)
 	// Finally looks for the position...
 	QGAMES::Position pos = layer -> positionFirstTile (__TILEGATE, p);
 	if (pos != QGAMES::Position::_noPoint)
-		a -> setPosition (pos - QGAMES::Vector (__BD dX, __BD dY, __BD 0)); 
+		a -> setPosition (pos + QGAMES::Vector (__BD dX, __BD dY, __BD 0)); 
 		// The orientation doesn't change...
 }
 

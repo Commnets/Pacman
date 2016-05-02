@@ -45,6 +45,9 @@ class PacmanGame : public QGAMES::ArcadeGame
 							{ return (_level); }
 	void setLevel (int l); 
 
+	/** To set whether the game is or not controlled by joystick. */
+	void setJoystick (bool j);
+
 	QGAMES::Position monsterPenPosition () const;
 	QGAMES::Position initialPacmanPosition () const;
 

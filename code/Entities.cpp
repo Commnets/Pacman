@@ -92,6 +92,21 @@ void PacmanArtist::confirmFinalAspect (PacmanArtist::MovingTo d)
 }
 
 // ---
+PacmanMonster::PacmanMonster (int id, const QGAMES::Forms& f, const QGAMES::Entity::Data& d)
+	: PacmanArtist (id, f, d),
+		_pacman (NULL),
+		_mode (_CHASE),
+		_collegues (),
+		_counterScatter (0),
+		_counterChase (0),
+		_counterCycle (0),
+		_lastSpeed (__BD 0),
+		_whereToGo (QGAMES::Position::_cero)
+{ 
+	// Nothing else to do...
+}
+
+// ---
 void PacmanMonster::setState (PacmanArtist::State s)
 {
 	PacmanArtist::setState (s);
@@ -135,6 +150,7 @@ void PacmanMonster::initialize ()
 	// Implementation...
 	_counterScatter = _counterChase = _counterCycle = 0;
 	_lastPosition = QGAMES::Position::_cero;
+	_whereToGo = QGAMES::Position::_cero;
 }
 
 // ---
@@ -148,12 +164,8 @@ void PacmanMonster::updatePositions ()
 	if (_mode == PacmanMonster::_WAITING)
 		return;
 
-	// If the monster is moving in the maze, then nothing to decide...
-	// It can happens that duw to the delays of the movement, the monster didn't move
-	// In that case, no change in the situation is needed...
-	if (((position () - _lastPosition) != QGAMES::Position::_cero) &&
-		(dynamic_cast <MovementInTheMaze*> (_currentMovement) != NULL &&
-			!((MovementInTheMaze*) _currentMovement) -> isMoving ()))
+	// If the monster is moving in the maze,...new opportunity to decide...
+	if (dynamic_cast <MovementInTheMaze*> (_currentMovement) != NULL)
 	{
 		// To calculate the direction of the next movement...
 		setMove (QGAMES::Vector::_cero);
@@ -172,6 +184,18 @@ void PacmanMonster::updatePositions ()
 		return;
 	else
 		setChaseOrScatter (); // Otherwhise there could be...
+}
+
+// ---
+void PacmanMonster::drawOn (QGAMES::Screen* s, const QGAMES::Position& p)
+{
+	#ifndef NDEBUG
+	// Draws a line to indicate where to go...
+	// Makes only sense when the game is running...
+	s -> drawLine (position (), _whereToGo, __REDCOLOR, 3);
+	s -> drawCircle (_whereToGo, QGAMES::Vector::_zNormal, 10, 10, __REDCOLOR);
+	#endif
+	PacmanArtist::drawOn (s, p);
 }
 
 // ---
@@ -194,7 +218,7 @@ void PacmanMonster::whenCollisionWith (QGAMES::Tile* t, QGAMES::TileLayer* l)
 }
 
 // ---
-QGAMES::Vector PacmanMonster::nextMove () const
+QGAMES::Vector PacmanMonster::nextMove ()
 {
 	// This vectors are to help the calculation...
 	// The orientations...
@@ -253,12 +277,12 @@ QGAMES::Vector PacmanMonster::nextMove () const
 		if (g -> mode () == PacmanGame::_NORMAL)
 			tPos = (_mode == PacmanMonster::_CHASE) ? targetPosition () : scatterPosition ();
 		else
-			tPos = QGAMES::Position (__BD (rand () % _map -> width ()),
-				__BD (rand () % _map -> height ()), __BD 0); // In frightning mode...random
+			tPos = scatterPosition (); // In frightning mode...to the headquarter
 	}
 	// When the monster is died, the pen position has to be found...
 	else
 		tPos = g -> monsterPenPosition ();
+	_whereToGo = tPos;
 
 	// Once the target position has been determinated,
 	// it is time to calculate the distance to each and select the one with the minimal
@@ -967,7 +991,7 @@ QGAMES::Entity* ScoreLive::clone ()
 ScoreLives::ScoreLives ()
 	: CompositeEntity (__ENTITYLIVES, QGAMES::Entities ()),
 	  _lives (0),
-	  _maxLives (_MAXNUMBEROFLIVES)
+	  _maxLives (__MAXNUMBEROFLIVES__)
 {
 }
 

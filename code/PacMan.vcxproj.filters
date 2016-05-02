@@ -87,6 +87,9 @@
     <ClInclude Include="General.hpp">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Entities.cpp">
@@ -177,6 +180,9 @@
     <Image Include="maps\chompermazetiles.png">
       <Filter>files\maps</Filter>
     </Image>
+    <Image Include="forms\pacmanico.ico">
+      <Filter>Archivos de recursos</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="maps\map.tmx">
@@ -206,5 +212,10 @@
     <Media Include="sounds\pacman_intermission.wav">
       <Filter>files\sounds</Filter>
     </Media>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="PacMan.rc">
+      <Filter>Archivos de recursos</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>
