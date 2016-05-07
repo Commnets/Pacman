@@ -100,8 +100,12 @@ void InputHandler::onJoystickAxisMoveEvent (QGAMES::JoystickMovementEventData* d
 			}
 
 			// Moves pacman...
-			if (_mX != 0) if (_mX > 0) pacmanRight (); else pacmanLeft ();
-			else if (_mY > 0) pacmanDown (); else pacmanUp ();
+			// x axis?
+			if (_mX > 0) pacmanRight (); 
+			else if (_mX < 0) pacmanLeft ();
+			// y axis?
+			if (_mY > 0) pacmanDown (); 
+			else if (_mY < 0) pacmanUp ();
 		}
 		else
 		if (_game -> activeState () -> type () == __GAMESTATEINITIAL)
@@ -110,7 +114,6 @@ void InputHandler::onJoystickAxisMoveEvent (QGAMES::JoystickMovementEventData* d
 			{
 				// The system will move focus to the next or previous position
 				// Just if is not already changing! (see declaration of GameStateInitial class).
-				GameStateInitial* st = (GameStateInitial*) _game -> activeState ();
 				if (dt -> _deadLine > 0)
 				{
 					if (dt -> _deadLine > (maxPosJoystick (dt -> _numberAxis) / 4))
