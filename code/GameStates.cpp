@@ -330,6 +330,7 @@ void GameStatePrelude::onEnter ()
 	_counterState = 0;
 	_direction = 1;
 	_stateFinishes = false;
+	_wantToExit = false;
 
 	// Entering, there is not still world alive...
 	// Just to avoid entities to be managed by the main game loop...
@@ -440,7 +441,7 @@ void GameStatePrelude::updatePositions ()
 	if (_counterState == (2 * _game -> framesPerSecond ()))
 		_stateFinishes = true; 
 	// At the second five (when music finishes), the game starts automatically...
-	if (_counterState == (5 * _game -> framesPerSecond ()))
+	if (_counterState == (5 * _game -> framesPerSecond ()) || _wantToExit)
 		_game -> setState (__GAMESTATEPLAYINGNAME); 
 }
 
@@ -742,7 +743,7 @@ void GameStateMazeClean::updatePositions ()
 		// Every three rounds...changes to the state to the end of the round...
 		// Otherwhise the maze is clean up and a new round starts again...
 		int l = ((PacmanGame*) _game) -> level ();
-		_game -> setState ((l % 3 == 0 && l != 0) 
+		_game -> setState (((l % 3) == 0 && l != 0) 
 			? __GAMESTATEROUNDENDNAME : __GAMESTATEPRELUDESHORTNAME);
 	}
 }
@@ -854,14 +855,68 @@ void GameStatePacmanDies::onExit ()
 }
 
 // ---
+GameStateRoundEnd::GameStateRoundEnd (QGAMES::Game* g)
+	: QGAMES::GameState (__GAMESTATEROUNDEND, g),
+	  _pacman (NULL), 
+	  _counterState (0),
+	  _aWorld (NULL),
+	  _counterForm (0),
+	  _counterToChangeForm (0),
+	  _runningAway (true),
+	  _position (QGAMES::Position::_cero),
+	  _iFPacman (0), _iFBlinky (0), _iFPinky (0), _iFInky (0), _iFClyde (0),
+	  _mov (QGAMES::Vector::_cero), _inc (QGAMES::Vector::_cero),
+	  _finishes (false)
+{
+	// Nothing else to do so far...
+}
+
+// ---
 void GameStateRoundEnd::onEnter ()
 {
 	_counterState = 0;
+	_counterForm = 0;
+	_counterToChangeForm = 0;
+	_position = 
+		QGAMES::Position (__BD (__SCREENWIDTH__ + 50), __BD (__SCREENHEIGHT__ >> 1), __BD 0);
+	_runningAway = true;
+	_mov = QGAMES::Vector (__BD 4, __BD 0, __BD 0);
+	_inc = QGAMES::Vector (__BD 40, __BD 0, __BD 0);
+	_finishes = false;
 
 	// Keeps the current world, just to avoid
 	// The main loop to draw and manage the presentation...
 	_aWorld = ((PacmanGame*) _game) -> activeWorld (); // It will be reestablished later on...
 	((PacmanGame*) _game) -> setWorld (__MININT__);
+
+	_pacman = (Pacman*)	((PacmanGame*) _game) -> entity (__ENTITYPACMAN);
+	_pacman -> setCurrentForm (__SPRITESFORM);
+	_iFPacman = __PACMANLEFTMINFRAME; _pacman -> setCurrentAspect (_iFPacman);
+	_pacman -> setCurrentMovement (__MININT__);
+	_pacman -> setPosition (_position);
+
+	_blinky = (Blinky*) ((PacmanGame*) _game) -> entity (__ENTITYBLINKY);
+	_blinky -> setCurrentForm (__SPRITESFORM);
+	_iFBlinky = __BLINKYLEFTMINFRAME; _blinky -> setCurrentAspect (_iFBlinky);
+	_blinky -> setCurrentMovement (__MININT__);
+	_blinky -> setPosition (_position + (3 * _inc));
+
+	_pinky = (Pinky*) ((PacmanGame*) _game) -> entity (__ENTITYPINKY);
+	_pinky -> setCurrentForm (__SPRITESFORM);
+	_iFPinky = __PINKYLEFTMINFRAME; _pinky -> setCurrentAspect (_iFPinky);
+	_pinky -> setPosition (_position + (4 * _inc));
+
+	_inky = (Inky*) ((PacmanGame*) _game) -> entity (__ENTITYINKY);
+	_inky -> setCurrentForm (__SPRITESFORM);
+	_iFInky = __INKYLEFTMINFRAME; _inky -> setCurrentAspect (_iFInky);
+	_inky -> setCurrentMovement (__MININT__);
+	_inky -> setPosition (_position + (5 * _inc));
+
+	_clyde = (Clyde*) ((PacmanGame*) _game) -> entity (__ENTITYCLYDE);
+	_clyde -> setCurrentForm (__SPRITESFORM);
+	_iFClyde = __CLYDELEFTMINFRAME; _clyde -> setCurrentAspect (_iFClyde);
+	_clyde -> setCurrentMovement (__MININT__);
+	_clyde -> setPosition (_position + (6 * _inc));
 
 	// The main sound...intermission sound......
 	_game -> sound (__SOUNDINTERMISSION) -> play (-1);
@@ -870,16 +925,72 @@ void GameStateRoundEnd::onEnter ()
 // ---
 void GameStateRoundEnd::updatePositions ()
 {
+	// The counter to change the form...
+	if (_counterToChangeForm++ >= 6)
+	{
+		_counterToChangeForm = 0;
+		if (_counterForm++ >= 1)
+			_counterForm = 0;
+	}
+
+	// Change the movement...
+	// ...in the left side?
+	if (_clyde -> position ().posX () <= -60)
+	{
+		_runningAway = false;
+		_iFPacman = __GIANTPACMANRIGHTMINFRAME;
+		_pacman -> setCurrentForm (__GIANTPACMANFORM__);
+		_iFBlinky = __BLINKYRIGHTMINFRAME;
+		_iFPinky = __PINKYRIGHTMINFRAME;
+		_iFInky = __INKYRIGHTMINFRAME;
+		_iFClyde = __CLYDERIGHTMINFRAME;
+	}
+	// ..in the right side?
+	if (_pacman -> position ().posX () >= (__SCREENWIDTH__ + 60))
+	{
+		_runningAway = true;
+		_iFPacman = __PACMANLEFTMINFRAME;
+		_pacman -> setCurrentForm (__SPRITESFORM);
+		_iFBlinky = __BLINKYLEFTMINFRAME;
+		_iFPinky = __PINKYLEFTMINFRAME;
+		_iFInky = __INKYLEFTMINFRAME;
+		_iFClyde = __CLYDELEFTMINFRAME;
+		_finishes = true;
+	}
+
+	// Moves the elements...
+	if (_runningAway) _position -= _mov;
+	else _position += _mov;
+
+	// Assign the form...
+	_pacman -> setCurrentAspect (_iFPacman + _counterForm);
+	_blinky -> setCurrentAspect (_iFBlinky + _counterForm);
+	_pinky -> setCurrentAspect (_iFPinky + _counterForm);
+	_inky -> setCurrentAspect (_iFInky + _counterForm);
+	_clyde -> setCurrentAspect (_iFClyde + _counterForm);
+
+	// And set again the position...
+	_pacman -> setPosition ((_runningAway) 
+		? _position : (_position - QGAMES::Vector (__BD 0, __BD 48, __BD 0)));
+	_blinky -> setPosition (_position + _mov + (3 * _inc));
+	_pinky -> setPosition (_position + _mov + (4 * _inc));
+	_inky -> setPosition (_position + _mov + (5 * _inc));
+	_clyde -> setPosition (_position + _mov + (6 * _inc));
+
 	_counterState++;
 	// At the second five, the system moves to the next level...
-	if (_counterState == (5 * _game -> framesPerSecond ()))
+	if (_counterState == (20 * _game -> framesPerSecond ()) || _finishes)
 		_game -> setState (__GAMESTATEPRELUDESHORTNAME);
 }
 
 // ---
 void GameStateRoundEnd::drawOn (QGAMES::Screen* s)
 {
-	// TO DO...
+	_pacman -> drawOn (s);
+	_blinky -> drawOn (s);
+	_pinky -> drawOn (s);
+	_inky -> drawOn (s);
+	_clyde -> drawOn (s);
 }
 
 // ---

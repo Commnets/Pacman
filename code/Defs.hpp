@@ -20,6 +20,7 @@
 #define __SCREENHEIGHT__				704
 #define __MAXNUMBEROFLIVES__			4
 #define __REDCOLOR						QGAMES::Color (255,0,0,255)
+#define __GRAYCOLOR						QGAMES::Color (100,100,100,255)
 
 // The game states:
 #define __GAMESTATELOADING				0
@@ -38,8 +39,8 @@
 #define __GAMESTATEPACMANDIESNAME		"5"
 #define __GAMESTATEROUNDEND				6
 #define __GAMESTATEROUNDENDNAME			"6"
-#define __GAMESTATEEND					6
-#define __GAMESTATEENDNAME				"6"
+#define __GAMESTATEEND					7
+#define __GAMESTATEENDNAME				"7"
 #define __NUMBEROPTIONS					5
 #define __MAXNUMBEROFDIFFICULTYLEVELS	3
 
@@ -77,6 +78,7 @@
 #define __PACMANICOFORM					12
 #define __SPRITESFORM					1
 #define __NUMBERSFORM					2
+#define __GIANTPACMANFORM__				3
 #define __READYFORM						104
 #define __LETTERSFORM					105
 #define __MAZEFORM						10000
@@ -113,6 +115,8 @@
 #define __PACMANDOWNMAXFRAME			25
 #define __PACMANRIGHTMINFRAME			10
 #define __PACMANRIGHTMAXFRAME			11
+#define __GIANTPACMANRIGHTMINFRAME		0
+#define __GIANTPACMANRIGHTMAXFRAME		1
 // Blinky
 #define __BLINKYUPMINFRAME				42
 #define __BLINKYUPMAXFRAME				43

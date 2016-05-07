@@ -133,11 +133,15 @@ class GameStatePrelude : public QGAMES::GameState
 		  _counterState (0),
 		  _stateFinishes (false),
 		  _aWorld (NULL),
-		  _aMap (NULL)
+		  _aMap (NULL),
+		  _wantToExit (false)
 							{ }
 
 	bool stateFinishes () const
 							{ return (_stateFinishes); }
+
+	void setWantToExit (bool s)
+							{ _wantToExit = s; }
 
 	virtual void onEnter ();
 	virtual void updatePositions ();
@@ -162,6 +166,7 @@ class GameStatePrelude : public QGAMES::GameState
 	int _direction;
 	int _counterState;
 	bool _stateFinishes;
+	bool _wantToExit;
 };
 
 /** This class represents the state before the play starts....but very short
@@ -296,12 +301,7 @@ class GameStatePacmanDies : public QGAMES::GameState
 class GameStateRoundEnd : public QGAMES::GameState
 {
 	public:
-	GameStateRoundEnd (QGAMES::Game* g)
-		: QGAMES::GameState (__GAMESTATEROUNDEND, g),
-		  _pacman (NULL), 
-		  _counterState (0),
-		  _aWorld (NULL)
-							{ }
+	GameStateRoundEnd (QGAMES::Game* g);
 
 	virtual void onEnter ();
 	virtual void updatePositions ();
@@ -311,10 +311,21 @@ class GameStateRoundEnd : public QGAMES::GameState
 	private:
 	// The main elements of the game...
 	Pacman*	_pacman;
+	Blinky* _blinky;
+	Pinky*	_pinky;
+	Inky*	_inky;
+	Clyde*	_clyde;
 	QGAMES::World* _aWorld;
 
 	// Implementatation
 	int _counterState; 
+	int _counterForm;
+	int _counterToChangeForm;
+	bool _runningAway;
+	QGAMES::Position _position;
+	int _iFPacman, _iFBlinky, _iFPinky, _iFInky, _iFClyde;
+	QGAMES::Vector _mov, _inc;
+	bool _finishes;
 };
 
 /** The state when evrything has finishes. */

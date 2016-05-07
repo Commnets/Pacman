@@ -361,26 +361,21 @@ void MovementInTheMaze::moveOne (const QGAMES::Vector& d, const QGAMES::Vector& 
 		// Determinates whether it has or not to change the movement...
 		// It only happens when the limit has be achieved,
 		// And the limit is the tile width! (or height in the vertical movements)
+		// When the limit is achieved a new potential movement can be modified!
 		if (++_numberSteps == limit)
 		{
 			_numberSteps = 0;
-			if (_potentialMovement != _directionMovement)
-			{
-				changeMovementTo (_potentialMovement, e);
-				if (_moving)
-					move (_potentialMovement, QGAMES::Vector::_cero, e);
-			}
-			else
-			{
-				_moving = false;
-				e -> setOrientation (QGAMES::Vector::_cero);
-			}
+			_potentialMovement = ((PacmanArtist*) e) -> nextMovementAtLimit (_potentialMovement);
+			changeMovementTo (_potentialMovement, e);
+			if (_moving && ((PacmanArtist*) e) -> continueMoving ())
+				move (_potentialMovement, QGAMES::Vector::_cero, e);
 		}
 	}
 	else
 	{
+		_potentialMovement = ((PacmanArtist*) e) -> nextMovementAtLimit (_potentialMovement);
 		changeMovementTo (_potentialMovement, e);
-		if (_moving)
+		if (_moving && ((PacmanArtist*) e) -> continueMoving ())
 			move (_potentialMovement, QGAMES::Vector::_cero, e);
 	}
 }
@@ -460,7 +455,6 @@ void MovementEnteringThePen::moveOne (const QGAMES::Vector& d, const QGAMES::Vec
 	// In this type of movement, the parameters are not relevant...
 	// The movement is executed taken only into account the internal variables
 	// of the movement...
-
 	if (_firstMove)
 	{
 		_firstMove = false;
@@ -470,6 +464,7 @@ void MovementEnteringThePen::moveOne (const QGAMES::Vector& d, const QGAMES::Vec
 		_finalTargetPosition = _firstTargetPosition + 
 			(__BD ((MapMaze*) (__AT e) -> map ()) -> tileWidth () * 
 				((PacmanArtist*) e) -> tilesAtBeginning () *General::_e._right);
+		_direction = 0; // Going down first...
 	}
 
 	// Going down?

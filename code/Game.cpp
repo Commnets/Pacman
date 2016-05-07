@@ -115,11 +115,6 @@ void PacmanGame::setLevel (int l)
 			General::_e._variables [_level][__VARGHOSTSPEED]));
 	_clyde -> setSpeed ((int) (__BASESPEED * __PERCENTSPEED * 
 			General::_e._variables [_level][__VARGHOSTSPEED]));
-/*	_pacman -> setSpeed (30);
-	_blinky -> setSpeed (20);
-	_pinky -> setSpeed (20);
-	_inky -> setSpeed (20);
-	_clyde -> setSpeed (20);^*/
 }
 
 // ---
@@ -479,13 +474,13 @@ void PacmanGame::moveArtistToPortal (int p, PacmanArtist* a)
 	// When the collision happens, the artist was in aprt in the new tile...
 	// So, this distance in the new tile must be conserved
 	// In other to avoid bad positioning of the monster in the maze...
-	int tW = map -> tileWidth (); int tH = map -> tileHeight ();
-	int dX = (int) a -> position ().posX () % tW; int dY = (int) a -> position ().posY () % tH;
+	int tW = map -> tileWidth (); 
+	int dX = (int) a -> position ().posX () % tW; 
 
 	// Finally looks for the position...
 	QGAMES::Position pos = layer -> positionFirstTile (__TILEGATE, p);
 	if (pos != QGAMES::Position::_noPoint)
-		a -> setPosition (pos + QGAMES::Vector (__BD dX, __BD dY, __BD 0)); 
+		a -> setPosition (pos + QGAMES::Vector (__BD dX, __BD 0, __BD 0)); 
 		// The orientation doesn't change...
 }
 

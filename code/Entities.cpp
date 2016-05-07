@@ -3,6 +3,7 @@
 #include "Maps.hpp"
 #include "General.hpp"
 #include "Game.hpp"
+#include <iostream>
 
 // ---
 PacmanArtist::PacmanArtist (int id, const QGAMES::Forms& f, const QGAMES::Entity::Data& d)
@@ -10,7 +11,7 @@ PacmanArtist::PacmanArtist (int id, const QGAMES::Forms& f, const QGAMES::Entity
 		  _counter (0),
 		  _changeMovement (false),
 		  _movementToChange (__MININT__),
-		  _lastPosition (QGAMES::Position::_cero),
+//		  _lastPosition (QGAMES::Position::_cero),
 		  _initialize (false)
 { 
 	_aspects.resize (7); 
@@ -101,9 +102,11 @@ PacmanMonster::PacmanMonster (int id, const QGAMES::Forms& f, const QGAMES::Enti
 		_counterChase (0),
 		_counterCycle (0),
 		_lastSpeed (__BD 0),
-		_whereToGo (QGAMES::Position::_cero)
+		_whereToGo (QGAMES::Position::_cero),
+		_orientations (),
+		_sizes ()
 { 
-	// Nothing else to do...
+	// Nothing else to do so far...
 }
 
 // ---
@@ -142,6 +145,12 @@ bool PacmanMonster::continueMoving ()
 }
 
 // ---
+QGAMES::Vector PacmanMonster::nextMovementAtLimit (const QGAMES::Vector& d)
+{ 
+	return (nextMove ()); 
+}
+
+// ---
 void PacmanMonster::initialize ()
 {
 	setMode (PacmanMonster::_WAITING);
@@ -149,7 +158,6 @@ void PacmanMonster::initialize ()
 
 	// Implementation...
 	_counterScatter = _counterChase = _counterCycle = 0;
-	_lastPosition = QGAMES::Position::_cero;
 	_whereToGo = QGAMES::Position::_cero;
 }
 
@@ -163,14 +171,6 @@ void PacmanMonster::updatePositions ()
 	// If the monster is waiting...nothing to do except keep waiting!
 	if (_mode == PacmanMonster::_WAITING)
 		return;
-
-	// If the monster is moving in the maze,...new opportunity to decide...
-	if (dynamic_cast <MovementInTheMaze*> (_currentMovement) != NULL)
-	{
-		// To calculate the direction of the next movement...
-		setMove (QGAMES::Vector::_cero);
-		_lastPosition = position ();
-	}
 
 	// When the monster pass throught the pen position, and it is dead...
 	// It is time to restablish the initial status, everything starts again...
@@ -194,6 +194,7 @@ void PacmanMonster::drawOn (QGAMES::Screen* s, const QGAMES::Position& p)
 	// Makes only sense when the game is running...
 	s -> drawLine (position (), _whereToGo, __REDCOLOR, 3);
 	s -> drawCircle (_whereToGo, QGAMES::Vector::_zNormal, 10, 10, __REDCOLOR);
+	s -> drawRectangle (collisionZone (), __GRAYCOLOR);
 	#endif
 	PacmanArtist::drawOn (s, p);
 }
@@ -222,20 +223,26 @@ QGAMES::Vector PacmanMonster::nextMove ()
 {
 	// This vectors are to help the calculation...
 	// The orientations...
-	std::vector <QGAMES::Vector> orientations;
-	orientations.resize (4);
-	orientations [PacmanArtist::_DUP] = General::_e._up;
-	orientations [PacmanArtist::_DLEFT] = General::_e._left;
-	orientations [PacmanArtist::_DDOWN] = General::_e._down;
-	orientations [PacmanArtist::_DRIGHT] = General::_e._right;
+	if (_orientations.empty ())
+	{
+		_orientations.clear ();
+		_orientations.resize (4);
+		_orientations [PacmanArtist::_DUP] = General::_e._up;
+		_orientations [PacmanArtist::_DLEFT] = General::_e._left;
+		_orientations [PacmanArtist::_DDOWN] = General::_e._down;
+		_orientations [PacmanArtist::_DRIGHT] = General::_e._right;
+	}
 
 	// ...and the sizes...
-	std::vector <int> sizes;
-	sizes.resize (4);
-	sizes [PacmanArtist::_DUP] = (__TM _map) -> tileHeight ();
-	sizes [PacmanArtist::_DLEFT] = (__TM _map) -> tileWidth ();
-	sizes [PacmanArtist::_DDOWN] = (__TM _map) -> tileHeight ();
-	sizes [PacmanArtist::_DRIGHT] = (__TM _map) -> tileWidth ();
+	if (_sizes.empty ())
+	{
+		_sizes.clear ();
+		_sizes.resize (4);
+		_sizes [PacmanArtist::_DUP] = (__TM _map) -> tileHeight ();
+		_sizes [PacmanArtist::_DLEFT] = (__TM _map) -> tileWidth ();
+		_sizes [PacmanArtist::_DDOWN] = (__TM _map) -> tileHeight ();
+		_sizes [PacmanArtist::_DRIGHT] = (__TM _map) -> tileWidth ();
+	}
 
 	// So it is time to calculate the different possibilities
 	// the monster has to move...
@@ -244,14 +251,14 @@ QGAMES::Vector PacmanMonster::nextMove ()
 	possibilities.resize (4);
 	for (int i = 0; i < 4; i++)
 	{
-		QGAMES::Vector pTile = position () + (__BD sizes [i] * orientations [i]);
-		QGAMES::Position lastPosition = position () - 
-			(__BD (__TM _map) -> tileWidth () * _direction);
-		possibilities [i] = (pTile != lastPosition) 
-			? (((__TM _map) -> tileAt (pTile) -> type () != __TILEMAZE) ? true : false)
-			: false;
+		if (_orientations [i] != -orientation ())
+		{
+			QGAMES::Vector pTile = position () + (__BD _sizes [i] * _orientations [i]);
+			possibilities [i] = 
+				((__TM _map) -> tileAt (pTile) -> type () != __TILEMAZE) ? true : false;
 		if (possibilities [i])
 			nPossibilities++;
+		}
 	}
 
 	// The only possibility available is to go back...
@@ -264,7 +271,7 @@ QGAMES::Vector PacmanMonster::nextMove ()
 		QGAMES::Vector result = QGAMES::Vector::_cero;
 		for (int i = 0; i < 4; i++)
 			if (possibilities [i])
-				result = orientations [i];
+				result = _orientations [i];
 		return (result);
 	}
 
@@ -290,7 +297,7 @@ QGAMES::Vector PacmanMonster::nextMove ()
 	int o = -1;
 	for (int i = 0; i != 4; i++)
 	{
-		QGAMES::Position pos = position () + (__BD sizes [i] * orientations [i]);
+		QGAMES::Position pos = position () + (__BD _sizes [i] * _orientations [i]);
 		QGAMES::bdata d = pos.distanceTo (tPos);
 		if (possibilities [i] && (d < __BD lD))
 		{
@@ -299,7 +306,7 @@ QGAMES::Vector PacmanMonster::nextMove ()
 		}
 	}
 
-	return (orientations [o]);
+	return (_orientations [o]);
 }
 
 // ---

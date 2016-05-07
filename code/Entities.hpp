@@ -50,6 +50,8 @@ class PacmanArtist : public QGAMES::ArtistInATiledMap
 	virtual void setSpeed (int s);
 	virtual bool continueMoving () 
 							{ return (true); }
+	virtual QGAMES::Vector nextMovementAtLimit (const QGAMES::Vector& d)
+							{ return (d); }
 
 	virtual void updatePositions ();
 
@@ -74,7 +76,7 @@ class PacmanArtist : public QGAMES::ArtistInATiledMap
 	bool _changeMovement;
 	int _movementToChange;
 	bool _initialize;
-	QGAMES::Position _lastPosition;
+//	QGAMES::Position _lastPosition;
 };
 
 /** Any monster. 
@@ -108,15 +110,12 @@ class PacmanMonster : public PacmanArtist
 	/** Points when the monster is eaten by pacman. */
 	virtual int pointsWhenEaten () const = 0;
 	virtual bool continueMoving ();
+	virtual QGAMES::Vector nextMovementAtLimit (const QGAMES::Vector& d);
 
 	virtual void initialize ();
 	virtual void updatePositions ();
 	virtual void drawOn (QGAMES::Screen* s, 
 		const QGAMES::Position& p = QGAMES::Position::_noPoint);
-
-	virtual void setMove (const QGAMES::Vector& d, 
-		const QGAMES::Vector& a = QGAMES::Vector (__BD  0, __BD 0, __BD 0))
-							{ _direction = nextMove (); _acceleration = a; }
 
 	virtual void whenCollisionWith (QGAMES::Tile* t, QGAMES::TileLayer* l = NULL);
 
@@ -142,6 +141,8 @@ class PacmanMonster : public PacmanArtist
 	int _counterPanic;
 	QGAMES::bdata _lastSpeed;
 	QGAMES::Position _whereToGo;
+	std::vector <QGAMES::Vector> _orientations;
+	std::vector <int> _sizes;
 };
 
 /** Finally: Pacman. */

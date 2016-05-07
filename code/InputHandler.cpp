@@ -259,7 +259,7 @@ void InputHandler::manakeKeyOnPlayingState (int k)
 void InputHandler::manakeKeyOnPreludeState (int k)
 {
 	// Any key is valid to move the game to the next state...
-//	((GameStatePrelude*) _game -> activeState ()) -> setWantToExit (true);
+	((GameStatePrelude*) _game -> activeState ()) -> setWantToExit (true);
 }
 
 // ---
