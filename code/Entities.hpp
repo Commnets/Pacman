@@ -1,3 +1,6 @@
+/** \addtogroup Pacman */
+/*@{*/
+
 #ifndef __ENTITIES_HPP__
 #define __ENTITIES_HPP__
 
@@ -334,3 +337,6 @@ class ScoreLives : public QGAMES::CompositeEntity
 };
 
 #endif
+  
+// End of the file
+/*@}*/

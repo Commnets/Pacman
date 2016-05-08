@@ -1,3 +1,6 @@
+/** \addtogroup Pacman */
+/*@{*/
+
 #ifndef __GAME_HPP__
 #define __GAME_HPP__
 
@@ -9,6 +12,8 @@
 class PacmanGame : public QGAMES::ArcadeGame
 {
 	public:
+	typedef std::multimap <int, std::string, std::less <int>> ScoreList;
+
 	/** Different states the pacman game can be on.
 		Normal, the usual situation,
 		Frightening, when the pacman eats a super ball, and the monsters run away
@@ -32,6 +37,9 @@ class PacmanGame : public QGAMES::ArcadeGame
 							{ return (_points -> score ()); }
 	void initScore () const
 							{ _points ->initialize (); }
+	ScoreList scores () const
+							{ return (_scores); }
+	void addScore (const std::string& p, int s);
 	int lives () const
 							{ return (_lives -> lives ()); }
 	void setLives (int l)
@@ -66,6 +74,7 @@ class PacmanGame : public QGAMES::ArcadeGame
 	virtual void inEveryLoop ();
 	virtual void updatePositions ();
 	virtual void detectCollisions ();
+	virtual void finalize (); 
 
 	void ballEated (QGAMES::Tile* t);
 	void superBallEated (QGAMES::Tile* t);
@@ -80,6 +89,7 @@ class PacmanGame : public QGAMES::ArcadeGame
 	ScoreLives* _lives;
 	Mode _mode;
 	int _level;
+	ScoreList _scores;
 
 	// Implementation
 	Pacman* _pacman;
@@ -100,3 +110,6 @@ class PacmanGame : public QGAMES::ArcadeGame
 };
 
 #endif
+  
+// End of the file
+/*@}*/

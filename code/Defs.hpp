@@ -1,3 +1,6 @@
+/** \addtogroup Pacman */
+/*@{*/
+
 #ifndef __DEFS__
 #define __DEFS__
 
@@ -18,9 +21,11 @@
 #define __SCREENYPOS__					50
 #define __SCREENWIDTH__					608
 #define __SCREENHEIGHT__				704
-#define __MAXNUMBEROFLIVES__			4
+#define __MAXNUMBEROFLIVES__			3
+#define __PLAYSTOROUND__				3
 #define __REDCOLOR						QGAMES::Color (255,0,0,255)
 #define __GRAYCOLOR						QGAMES::Color (100,100,100,255)
+#define __MAXSCORES						10
 
 // The game states:
 #define __GAMESTATELOADING				0
@@ -41,6 +46,10 @@
 #define __GAMESTATEROUNDENDNAME			"6"
 #define __GAMESTATEEND					7
 #define __GAMESTATEENDNAME				"7"
+#define __GAMESTATEINTROLETTERS			8
+#define __GAMESTATEINTROLETTERSNAME		"8"
+#define __GAMESTATESEESCORES			9
+#define __GAMESTATESEESCORESNAME		"9"
 #define __NUMBEROPTIONS					5
 #define __MAXNUMBEROFDIFFICULTYLEVELS	3
 
@@ -262,3 +271,6 @@
 #define __PERCENTSPEED					2
 
 #endif
+  
+// End of the file
+/*@}*/

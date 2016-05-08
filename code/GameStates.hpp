@@ -1,3 +1,6 @@
+/** \addtogroup Pacman */
+/*@{*/
+
 #ifndef __GAMESTATES_HPP__
 #define __GAMESTATES_HPP__
 
@@ -82,7 +85,6 @@ class GameStateInitial : public QGAMES::GameState
 	virtual void onExit ();
 
 	private:
-
 	// Implementation
 	/** Blinky is part of the selection. */
 	Blinky* _blinky;
@@ -370,4 +372,92 @@ class GameStateEnd : public QGAMES::GameState
 	bool _stateFinishes;
 };
 
+/** This class represents the state to introduce the initial of the player
+	after the game ends. */
+class GameStateIntroLetters : public QGAMES::GameState 
+{
+	public:
+	GameStateIntroLetters (QGAMES::Game* g);
+
+	void nextLetter ();
+	void previousLetter ();
+	void letterSelected ();
+
+	virtual void onEnter ();
+	virtual void updatePositions ();
+	virtual void drawOn (QGAMES::Screen* s);
+	virtual void onExit ();
+
+	private:
+	/** The background to be shown. */
+	QGAMES::Form* _background;
+	/** The logo form, shown in this state */
+	QGAMES::Form* _logo; 
+	/** The number of letter that is blinking.
+		It goes from 0 to 2. Only three letters can be modified as in the original game. */
+	int _nLetter;
+	/** The character ascii that is been displyed in that moment. */
+	int _cLetter;
+	/** Blinking attribute. */
+	int _blinkAttr;
+	/** Direction of the blinking. */
+	int _blinkDirection;
+	/** The letters. */
+	char _letters [4];
+	/** The score to add in number. */
+	int _nScore;
+	/** Max NUmber of scores. */
+	int _nMScores;
+	/** Score to add. */
+	std::string _sToAdd;
+
+	// Implementation
+	/** When the input handler detects an special key has been pressed
+		and the game stands in this state this variable is set to true. */
+	bool _wantToExit;
+	/** A vector with the initial introduced so far. */
+	std::vector <PacmanPresentationText*> _initials;
+	/** The scores. */
+	std::vector <PacmanPresentationText*> _tScores;
+	/** The position of the new initials within the list of initials. */
+	int _posNewInitials;
+	/** A chain of ceros. */
+	std::string _ceros;
+};
+
+/** This class represents the state to see the scores. */
+class GameStateSeeScore  : public QGAMES::GameState 
+{
+	public:
+	GameStateSeeScore (QGAMES::Game* g);
+
+	virtual void onEnter ();
+	virtual void updatePositions ();
+	virtual void drawOn (QGAMES::Screen* s);
+	virtual void onExit ();
+
+	void setWantToExit (bool e)
+							{ _wantToExit = e; }
+
+	private:
+	/** The background to be shown. */
+	QGAMES::Form* _background;
+	/** The logo form, shown in this state */
+	QGAMES::Form* _logo; 
+
+	// Implementation
+	/** When the input handler detects an special key has been pressed
+		and the game stands in this state this variable is set to true. */
+	bool _wantToExit;
+	/** A vector with the initial introduced so far. */
+	std::vector <PacmanPresentationText*> _initials;
+	/** The scores. */
+	std::vector <PacmanPresentationText*> _tScores;
+	/** A chain of ceros. */
+	std::string _ceros;
+};
+
 #endif
+  
+// End of the file
+/*@}*/

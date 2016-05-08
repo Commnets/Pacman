@@ -13,6 +13,7 @@
 #include <SDL/sdlformbuilder.hpp>
 #include <SDL/sdlsoundbuilder.hpp>
 #include <iostream>
+#include <fstream>
 #include <math.h>
 
 // ---
@@ -22,6 +23,7 @@ PacmanGame::PacmanGame ()
 		  _lives (NULL),
 		  _mode (_NORMAL),
 		  _level (1),
+		  _scores (),
 		  _pacman (NULL),
 		  _blinky (NULL), _pinky (NULL), _inky (NULL), _clyde (NULL),
 		  _monsters (),
@@ -72,7 +74,9 @@ void PacmanGame::removeScoreObjects ()
 	ArcadeGame::removeScoreObjects ();
 
 	delete _points;
+	_points = NULL;
 	delete _lives;
+	_lives = NULL;
 }
 
 // ---
@@ -81,6 +85,12 @@ void PacmanGame::initScore ()
 	addScoreObjects (); // If needed...
 	_points -> initialize (); // To 0...
 	_lives -> initialize (); // To the top of lives...
+}
+
+// ---
+void PacmanGame::addScore (const std::string& p, int s)
+{
+	_scores.insert (std::pair <int, std::string> (s, p));
 }
 
 // ---
@@ -272,6 +282,26 @@ void PacmanGame::initialize ()
 		(std::string (__GAMESTATEROUNDENDNAME), new GameStateRoundEnd (this)));
 	_gameStates.insert (QGAMES::GameStates::value_type 
 		(std::string (__GAMESTATEENDNAME), new GameStateEnd (this)));
+	_gameStates.insert (QGAMES::GameStates::value_type 
+		(std::string (__GAMESTATEINTROLETTERSNAME), new GameStateIntroLetters (this)));
+	_gameStates.insert (QGAMES::GameStates::value_type 
+		(std::string (__GAMESTATESEESCORESNAME), new GameStateSeeScore (this)));
+
+	// When the game starts, the list of the most famous player is loaded
+	// The list is something really simple to read
+	_scores.clear ();
+	std::ifstream scoreFile ("scores.txt");
+	if (scoreFile)
+	{
+		std::string usr, score;
+		while (!scoreFile.eof ())
+		{
+			scoreFile >> score >> usr;
+			_scores.insert (std::pair <int, std::string> (atoi (score.c_str ()), usr));
+		}
+
+		scoreFile.close ();
+	}
 
 	// The initial state...
 	setState (std::string (__GAMESTATELOADINGNAME));
@@ -412,6 +442,28 @@ void PacmanGame::detectCollisions ()
 				if ((*i) -> state () != PacmanMonster::_DIE)
 					monsterEaten ((*i)); // Only when the monsters is not already die...
 		}
+	}
+}
+
+// ---
+void PacmanGame::finalize ()
+{
+	ArcadeGame::finalize ();
+
+	// When the game finishes, the list is saved
+	std::ofstream scoreFile ("scores.txt");
+	if (scoreFile)
+	{
+		bool f = true;
+		for (ScoreList::const_iterator i = _scores.begin ();
+				i != _scores.end (); i++)
+		{
+			if (!f) scoreFile << std::endl;
+			scoreFile << (*i).first << std::string ("\t") << (*i).second;
+			f = false;
+		}
+
+		scoreFile.close ();
 	}
 }
 

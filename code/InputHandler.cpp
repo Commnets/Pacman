@@ -38,6 +38,7 @@ void InputHandler::onJoystickAxisMoveEvent (QGAMES::JoystickMovementEventData* d
 	// Only one joystick available...
 	if (dt -> _numberJoystick == 0) 
 	{
+		// ...when the user is playing...
 		if (_game -> activeState () -> type () == __GAMESTATEPLAYING)
 		{
 			// If the device to control the character is not joystick when playing, nothing to do here...
@@ -108,6 +109,7 @@ void InputHandler::onJoystickAxisMoveEvent (QGAMES::JoystickMovementEventData* d
 			else if (_mY < 0) pacmanUp ();
 		}
 		else
+		// ...when he is in the initial selection of the difficulty
 		if (_game -> activeState () -> type () == __GAMESTATEINITIAL)
 		{
 			if (dt -> _numberAxis == 1) // Moving in the y axis to select...
@@ -136,6 +138,36 @@ void InputHandler::onJoystickAxisMoveEvent (QGAMES::JoystickMovementEventData* d
 			if (_dJ == 1) st -> nextOption ();
 			else if (_dJ == -1) st -> previousOption ();
 		}
+		else
+		// ...when he is introducing the initial after finalizing the game...
+		if (_game -> activeState () -> type () == __GAMESTATEINTROLETTERS)
+		{
+			if (dt -> _numberAxis == 0) // Moving in the x axis to select...
+			{
+				// The system will move focus to the next or previous position
+				// Just if is not already changing! (see declaration of GameStateInitial class).
+				if (dt -> _deadLine > 0)
+				{
+					if (dt -> _deadLine > (maxPosJoystick (dt -> _numberAxis) / 4))
+						_dJ += (_dJ < 1) ? 1 : 0;
+					else
+						_dJ -= (_dJ > 0) ? 1 : 0;
+				}
+				else
+				if (dt -> _deadLine < 0)
+				{
+					if (dt -> _deadLine < (minPosJoystick (dt -> _numberAxis) / 4))
+						_dJ += (_dJ > -1) ? -1 : 0;
+					else
+						_dJ -= (_dJ < 0) ? -1 : 0;
+				}
+			}
+
+			// Move to the option depending on the axis movement...
+			GameStateIntroLetters* st = (GameStateIntroLetters*) _game -> activeState ();
+			if (_dJ == 1) st -> nextLetter ();
+			else if (_dJ == -1) st -> previousLetter ();
+		}
 	}
 }
 
@@ -151,6 +183,14 @@ void InputHandler::onJoystickButtonEvent (QGAMES::JoystickButtonEventData* dt)
 			if (_game -> activeState () -> type () == __GAMESTATEINITIAL && 
 					dt -> _numberButton == 0)
 				((GameStateInitial*) _game -> activeState ()) -> optionSelected ();
+			else
+			if (_game -> activeState () -> type () == __GAMESTATEINTROLETTERS &&
+					dt -> _numberButton == 0)
+				((GameStateIntroLetters*) _game -> activeState ()) -> letterSelected ();
+			else
+			if (_game -> activeState () -> type () == __GAMESTATESEESCORES &&
+					dt -> _numberButton == 0)
+				((GameStateSeeScore*) _game -> activeState ()) -> setWantToExit (true);
 		}
 	}
 }
@@ -189,6 +229,14 @@ void InputHandler::onKeyboardEvent (QGAMES::KeyboardEventData* dt)
 				manakeKeyOnPlayingState (kPressed);
 				break;
 
+			case __GAMESTATEINTROLETTERS:
+				manageKeyOnIntroLetterState (kPressed);
+				break;
+
+			case __GAMESTATESEESCORES:
+				manageKeyOnSeeScoreState (kPressed);
+				break;
+
 			default:
 				break;
 		};
@@ -223,6 +271,11 @@ void InputHandler::onMouseButtonEvent (QGAMES::MouseButtonEventData* dt)
 		case __GAMESTATEPLAYING:
 			if (dt -> _button == SDL_BUTTON_LEFT && !dt -> _on) // To pause / continue the game...
 				_game -> isGamePaused () ? _game -> continueGame () : _game -> pauseGame ();
+			break;
+
+		case __GAMESTATESEESCORES:
+			if (dt -> _button == SDL_BUTTON_LEFT && !dt -> _on) // To return to the rpevious state...
+				((GameStateSeeScore*) _game -> activeState ()) -> setWantToExit (true);
 			break;
 
 		default:
@@ -263,6 +316,22 @@ void InputHandler::manakeKeyOnPreludeState (int k)
 {
 	// Any key is valid to move the game to the next state...
 	((GameStatePrelude*) _game -> activeState ()) -> setWantToExit (true);
+}
+
+// ---
+void InputHandler::manageKeyOnIntroLetterState (int k)
+{
+	GameStateIntroLetters* s = (GameStateIntroLetters*) _game -> activeState ();
+	if (k == SDL_SCANCODE_RIGHT) s -> nextLetter ();
+	else if (k == SDL_SCANCODE_LEFT) s -> previousLetter ();
+	else if (k == SDL_SCANCODE_RETURN || k == SDL_SCANCODE_RETURN2) s -> letterSelected ();
+}
+
+// ---
+void InputHandler::manageKeyOnSeeScoreState (int k)
+{
+	GameStateSeeScore* s = (GameStateSeeScore*) _game -> activeState ();
+	if (k == SDL_SCANCODE_RETURN || k == SDL_SCANCODE_RETURN2) s -> setWantToExit (true);
 }
 
 // ---

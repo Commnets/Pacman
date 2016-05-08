@@ -83,6 +83,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Defs.hpp" />
+    <ClInclude Include="doxy.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="Entities.hpp" />
     <ClInclude Include="EntitiesBuilder.hpp" />
     <ClInclude Include="Game.hpp" />

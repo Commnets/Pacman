@@ -1,3 +1,6 @@
+/** \addtogroup Pacman */
+/*@{*/
+
 #ifndef __GENERAL_HPP__
 #define __GENERAL_HPP__
 
@@ -18,3 +21,6 @@ class General
 };
 
 #endif
+  
+// End of the file
+/*@}*/

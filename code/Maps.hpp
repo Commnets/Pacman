@@ -1,3 +1,6 @@
+/** \addtogroup Pacman */
+/*@{*/
+
 #ifndef __MAPS_HPP__
 #define __MAPS_HPP__
 
@@ -63,3 +66,6 @@ class MapMazeA : public MapMaze
 };
 
 #endif
+  
+// End of the file
+/*@}*/

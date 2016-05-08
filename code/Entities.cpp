@@ -902,6 +902,7 @@ QGAMES::Entity* ScorePoints::clone ()
 // ---
 void ScorePoints::add (int n)
 {
+	_score += n;
 	_pendingToAdd.push_back (n);
 }
 

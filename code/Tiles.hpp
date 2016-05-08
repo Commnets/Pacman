@@ -1,3 +1,6 @@
+/** \addtogroup Pacman */
+/*@{*/
+
 #ifndef __TILES_HPP__
 #define __TILES_HPP__
 
@@ -56,3 +59,6 @@ class TileFruit : public QGAMES::Tile
 };
 
 #endif
+  
+// End of the file
+/*@}*/

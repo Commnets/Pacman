@@ -1,3 +1,6 @@
+/** \addtogroup Pacman */
+/*@{*/
+
 #ifndef __WORLDS_HPP__
 #define __WORLDS_HPP__
 
@@ -33,3 +36,6 @@ class WorldPacman : public QGAMES::World
 };
 
 #endif
+  
+// End of the file
+/*@}*/

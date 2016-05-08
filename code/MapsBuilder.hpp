@@ -1,3 +1,6 @@
+/** \addtogroup Pacman */
+/*@{*/
+
 #ifndef __MAPSBUILDER_HPP__
 #define __MAPSBUILDER_HPP__
 
@@ -26,3 +29,6 @@ class MapsBuilderAddsOn : public QGAMES::TMXMapBuilderAddsOn
 };
 
 #endif
+  
+// End of the file
+/*@}*/

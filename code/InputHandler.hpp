@@ -1,3 +1,6 @@
+/** \addtogroup Pacman */
+/*@{*/
+
 #ifndef __INPUTHANDLER_HPP__
 #define __INPUTHANDLER_HPP__
 
@@ -46,6 +49,10 @@ class InputHandler : public SDLInputHandler
 	void manakeKeyOnPlayingState (int k);
 	/** To determinate what to do when a key is pressed when pacman game is starting. */
 	void manakeKeyOnPreludeState (int k);
+	/** To determinate what to do when a key is pressed introduing the initial after the game. */
+	void manageKeyOnIntroLetterState (int k);
+	/** When the user is seeing the scores. */
+	void manageKeyOnSeeScoreState (int k);
 	/** Moves pacman to the left. */
 	void pacmanLeft ();
 	/** Moves pacman to the right. */
@@ -74,3 +81,6 @@ class InputHandler : public SDLInputHandler
 };
 
 #endif
+  
+// End of the file
+/*@}*/

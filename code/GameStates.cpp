@@ -131,8 +131,6 @@ void GameStateInitial::optionSelected ()
 		_typeOfControl = 0;
 	if (_currentOption == 1)
 		_typeOfControl = 1;
-	if (_currentOption == 2)
-		{ } // Nothing to do so far...
 
 	if (_currentOption == 3)
 	{
@@ -144,7 +142,7 @@ void GameStateInitial::optionSelected ()
 		_optionGraphics [3] -> setSpace (0);
 	}
 
-	if (_currentOption == 4)
+	if (_currentOption == 4 || _currentOption == 2)
 		_wantToExit = true;
 }
 
@@ -259,7 +257,8 @@ void GameStateInitial::updatePositions ()
 	// if the right key has been selected,
 	// It is time to move to the next state...
 	if (_wantToExit)
-		_game -> setState (__GAMESTATEPRELUDENAME);
+		_game -> setState ((_currentOption == 2) 
+			? __GAMESTATESEESCORESNAME : __GAMESTATEPRELUDENAME);
 }
 
 // ---
@@ -743,7 +742,7 @@ void GameStateMazeClean::updatePositions ()
 		// Every three rounds...changes to the state to the end of the round...
 		// Otherwhise the maze is clean up and a new round starts again...
 		int l = ((PacmanGame*) _game) -> level ();
-		_game -> setState (((l % 3) == 0 && l != 0) 
+		_game -> setState (((l % __PLAYSTOROUND__) == 0 && l != 0) 
 			? __GAMESTATEROUNDENDNAME : __GAMESTATEPRELUDESHORTNAME);
 	}
 }
@@ -920,6 +919,8 @@ void GameStateRoundEnd::onEnter ()
 
 	// The main sound...intermission sound......
 	_game -> sound (__SOUNDINTERMISSION) -> play (-1);
+	// Fix the screen atthe beginning...
+	_game -> mainScreen () -> setPosition (QGAMES::Vector::_cero);
 }
 
 // ---
@@ -1094,7 +1095,7 @@ void GameStateEnd::updatePositions ()
 		_stateFinishes = true; 
 	// At the second 5 the game goes automatically to the next stage...
 	if (_counterState == (5 * _game -> framesPerSecond ()))
-		_game -> setState (__GAMESTATEINITIALNAME);
+		_game -> setState (__GAMESTATEINTROLETTERSNAME);
 }
 
 // ---
@@ -1115,4 +1116,322 @@ void GameStateEnd::onExit ()
 	// Reestablish the world...
 	((PacmanGame*) _game) -> setWorld (_aWorld -> id ());
 	// The map has not to be initialize, as the pacman has still to clean the maze...
+}
+
+// ---
+GameStateIntroLetters::GameStateIntroLetters (QGAMES::Game* g)
+	: QGAMES::GameState (__GAMESTATEINTROLETTERS, g),
+	  _background (NULL),
+	  _logo (NULL),
+	  _nLetter (0),
+	  _cLetter (32), // First letter is always an space...
+	  _blinkAttr (0),
+	  _blinkDirection (1),
+	  _nScore (0),
+	  _nMScores (0),
+	  _sToAdd (__NULL_STRING__),
+	  _wantToExit (false),
+	  _initials (),
+	  _tScores (),
+	  _posNewInitials (0),
+	  _ceros ("000000")
+{
+	_letters [0] = _letters [1] = _letters [2] = 42; // Asterisc...
+	_letters [3] = 0;
+}
+
+// ---
+void GameStateIntroLetters::nextLetter ()
+{
+	if (++_cLetter == 94) 
+		_cLetter = 33;
+	if (_cLetter == 40 || _cLetter == 41) _cLetter = 42;
+	_letters [_nLetter] = _cLetter;
+}
+
+void GameStateIntroLetters::previousLetter ()
+{
+	if (--_cLetter == 32) 
+		_cLetter = 93;
+	if (_cLetter == 40 || _cLetter == 41) _cLetter = 39;
+	_letters [_nLetter] = _cLetter;
+}
+
+void GameStateIntroLetters::letterSelected ()
+{
+	if (++_nLetter == 3)
+		_wantToExit = true;
+}
+
+void GameStateIntroLetters::onEnter ()
+{
+	// The background used during this state
+	_background = _game -> form (__BACKGROUNDINITIALFORM);
+	// The logo used during this state...
+	_logo = _game -> form (__COMMTYLOGOFORM);
+	// The number of the letter to me modified first is the 0
+	_nLetter = 0;
+	// The first character valid is an space...
+	_cLetter = 32;
+	// Blinking attribute
+	_blinkAttr = 50;
+	// The dircetion is up...
+	_blinkDirection = 2;
+	// The letters are spaces...
+	_letters [0] = _letters [1] = _letters [2] = 42; _letters [3] = 0;
+	// Not exit so far...
+	_wantToExit = false;
+	// The score to add...
+	_nScore = ((PacmanGame*) _game) -> score ();
+	char nST[255]; _itoa_s (_nScore, nST, 10);
+	_sToAdd = std::string (nST);
+	if (_sToAdd.length () < 6)
+		_sToAdd = _ceros.substr (0, 6 - _sToAdd.length ()) + _sToAdd;
+
+	// The world finishes...
+	((PacmanGame*) _game) -> setWorld (__MININT__);
+	// Fix the screen atthe beginning...
+	_game -> mainScreen () -> setPosition (QGAMES::Vector::_cero);
+	_game -> removeScoreObjects ();
+
+	// Create the initials...
+	_initials.resize (__MAXSCORES); _tScores.resize (__MAXSCORES);
+	_posNewInitials = 0; // Means that by default new initials go at the beginning of the list!
+	int nI = 0; 
+	PacmanGame::ScoreList lst = ((PacmanGame*) _game) -> scores ();
+	for (PacmanGame::ScoreList::const_reverse_iterator i = lst.rbegin (); 
+			i != lst.rend () && nI < __MAXSCORES; i++, nI++)
+	{
+		if (_nScore < (*i).first) _posNewInitials = nI + 1;
+
+		_initials [nI] = new PacmanPresentationText ((*i).second);
+		_initials [nI] -> setSpace (5);
+
+		char v[255]; _itoa_s ((*i).first, v, 10);
+		std::string vS (v); 
+		if (vS.length () < 6) 
+			vS = _ceros.substr (0, 6 - vS.length ()) + vS;
+		_tScores [nI] = new PacmanPresentationText (vS);
+		_tScores [nI] -> setSpace (5);
+	}
+
+	// The rest of the initial up to __MAXSCORES are empty...
+	_nMScores = nI;
+	for (int i = nI; i < __MAXSCORES; i++)
+	{
+		_initials [i] = new PacmanPresentationText (std::string ("AAA"));
+		_tScores [i] = new PacmanPresentationText (_ceros);
+		_initials [i] -> setSpace (5);
+		_tScores [i] -> setSpace (5);
+	}
+}
+
+void GameStateIntroLetters::updatePositions ()
+{
+	// Blinks...
+	_blinkAttr += _blinkDirection;
+	if (_blinkAttr > 150) _blinkAttr = 150;
+	if (_blinkAttr < 50) _blinkAttr = 50;
+	if (_blinkAttr == 150 || _blinkAttr == 50)
+		_blinkDirection *= -1;
+
+	// if the right key has been selected,
+	// It is time to move to the next state...
+	if (_wantToExit)
+		_game -> setState (__GAMESTATEINITIALNAME);
+}
+
+void GameStateIntroLetters::drawOn (QGAMES::Screen* s)
+{
+	// Draw the background and the logo...
+	_background -> drawOn (s, 0, QGAMES::Position::_cero, 100); // A little bit fade - out!
+	QGAMES::Position lPos = QGAMES::Position 
+		(__BD 10, __BD (__SCREENHEIGHT__ - _logo -> frameHeight () - 10), __BD 0); 
+	_logo -> drawOn (s, 0, lPos);
+
+	// The original positions...
+	QGAMES::Position iPos (__BD 100, __BD 50, __BD 0);
+	QGAMES::Position oPos = iPos;
+	QGAMES::Vector incX (__BD 40, __BD 0, __BD 0);
+	QGAMES::Vector incY (__BD 0, __BD 50, __BD 0);
+	QGAMES::Vector aTxt (__BD 275, __BD 0, __BD 0);
+
+	// Draws a full rectangle around the current options selected
+	// The color of the rectangle is gray...
+	QGAMES::Position p1A = oPos + (__BD (_posNewInitials + 1) * incY) + (__BD _nLetter * incX) + aTxt;
+	QGAMES::Position p2A = p1A + QGAMES::Vector (__BD 40, __BD 5, __BD 0);
+	s -> drawRectangle (QGAMES::Rectangle (p1A, p2A), QGAMES::Color (_blinkAttr, _blinkAttr, _blinkAttr), true);
+	s -> drawRectangle (QGAMES::Rectangle (p1A, p2A), QGAMES::Color (255, 255, 255));
+
+	// It is time to draw...
+	if (_nMScores == 0)
+	{
+		PacmanPresentationText* nS = new PacmanPresentationText (_sToAdd);
+		nS -> setSpace (5); 
+		nS -> drawOn (s, oPos);
+		delete nS;
+
+		for (int j = 0; j < 3; j++)
+		{
+			PacmanPresentationText* nT = new PacmanPresentationText (std::string (1, _letters [j]));
+			nT -> setSpace (5); 
+			nT -> drawOn (s, oPos + aTxt + (__BD j * incX));
+			delete nT;
+		}
+	}
+	else
+	{
+		int i = 0;
+		for (; i < __MAXSCORES && i < _nMScores; i++)
+		{
+			if (i == _posNewInitials)
+			{
+				PacmanPresentationText* nS = new PacmanPresentationText (_sToAdd);
+				nS -> setSpace (5); 
+				nS -> drawOn (s, oPos);
+				delete nS;
+
+				for (int j = 0; j < 3; j++)
+				{
+					PacmanPresentationText* nT = new PacmanPresentationText (std::string (1, _letters [j]));
+					nT -> setSpace (5); 
+					nT -> drawOn (s, oPos + aTxt + (__BD j * incX));
+					delete nT;
+				}
+
+				oPos += incY;
+			}
+
+			_tScores [i] -> drawOn (s, oPos);
+			_initials [i] -> drawOn (s, oPos + aTxt);
+			oPos += incY;
+		}
+
+		if (i == _posNewInitials)
+		{
+			PacmanPresentationText* nS = new PacmanPresentationText (_sToAdd);
+			nS -> setSpace (5); 
+			nS -> drawOn (s, oPos);
+			delete nS;
+
+			for (int j = 0; j < 3; j++)
+			{
+				PacmanPresentationText* nT = new PacmanPresentationText (std::string (1, _letters [j]));
+				nT -> setSpace (5); 
+				nT -> drawOn (s, oPos + aTxt + (__BD j * incX));
+				delete nT;
+			}
+		}
+	}
+}
+
+void GameStateIntroLetters::onExit ()
+{
+	// Deletes all the texts...
+	for (int i = 0; i < __MAXSCORES; i++)
+	{
+		delete (_initials [i]);
+		delete (_tScores [i]);
+	}
+
+	((PacmanGame*) _game) -> addScore (_letters, _nScore);
+	_initials.clear ();
+	_tScores.clear ();
+}
+
+
+// ---
+GameStateSeeScore::GameStateSeeScore (QGAMES::Game* g)
+	: QGAMES::GameState (__GAMESTATESEESCORES, g),
+	  _background (NULL),
+	  _logo (NULL),
+	  _wantToExit (false),
+	  _initials (),
+	  _tScores (),
+	  _ceros ("000000")
+{
+	// Nothing else to do...
+}
+
+void GameStateSeeScore::onEnter ()
+{
+	// The background used during this state
+	_background = _game -> form (__BACKGROUNDINITIALFORM);
+	// The logo used during this state...
+	_logo = _game -> form (__COMMTYLOGOFORM);
+	// Not exit so far...
+	_wantToExit = false;
+
+	// The world finishes...
+	((PacmanGame*) _game) -> setWorld (__MININT__);
+	// Fix the screen atthe beginning...
+	_game -> mainScreen () -> setPosition (QGAMES::Vector::_cero);
+	_game -> removeScoreObjects ();
+
+	// Create the initials...
+	int nI = 0;
+	_initials.resize (__MAXSCORES); _tScores.resize (__MAXSCORES);
+	PacmanGame::ScoreList lst = ((PacmanGame*) _game) -> scores ();
+	for (PacmanGame::ScoreList::const_reverse_iterator i = lst.rbegin (); 
+			i != lst.rend (); i++, nI++)
+	{
+		_initials [nI] = new PacmanPresentationText ((*i).second);
+		_initials [nI] -> setSpace (5);
+
+		char v[255]; _itoa_s ((*i).first, v, 10);
+		std::string vS (v); 
+		if (vS.length () < 6) 
+			vS = _ceros.substr (0, 6 - vS.length ()) + vS;
+		_tScores [nI] = new PacmanPresentationText (vS);
+		_tScores [nI] -> setSpace (5);
+	}
+
+	for (int i = nI; i < __MAXSCORES; i++)
+		_initials [i] = _tScores [i] = NULL; // Nothing...
+}
+
+// ---
+void GameStateSeeScore::updatePositions ()
+{
+	if (_wantToExit)
+		_game -> setState (__GAMESTATEINITIALNAME);
+}
+
+void GameStateSeeScore::drawOn (QGAMES::Screen* s)
+{
+	// Draw the background and the logo...
+	_background -> drawOn (s, 0, QGAMES::Position::_cero, 100); // A little bit fade - out!
+	QGAMES::Position lPos = QGAMES::Position 
+		(__BD 10, __BD (__SCREENHEIGHT__ - _logo -> frameHeight () - 10), __BD 0); 
+	_logo -> drawOn (s, 0, lPos);
+
+	// The original positions...
+	QGAMES::Position iPos (__BD 100, __BD 50, __BD 0);
+	QGAMES::Position oPos = iPos;
+	QGAMES::Vector incX (__BD 40, __BD 0, __BD 0);
+	QGAMES::Vector incY (__BD 0, __BD 50, __BD 0);
+	QGAMES::Vector aTxt (__BD 275, __BD 0, __BD 0);
+
+	for (int i = 0; i < __MAXSCORES; i++)
+	{
+		if (_tScores [i] != NULL)
+		{
+			_tScores [i] -> drawOn (s, oPos);
+			_initials [i] -> drawOn (s, oPos + aTxt);
+			oPos += incY;
+		}
+	}
+}
+
+void GameStateSeeScore::onExit ()
+{
+	// Deletes all the texts...
+	for (int i = 0; i < __MAXSCORES; i++)
+	{
+		delete (_initials [i]);
+		delete (_tScores [i]);
+	}
+
+	_initials.clear ();
+	_tScores.clear ();
 }

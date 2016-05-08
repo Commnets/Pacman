@@ -1,3 +1,6 @@
+/** \addtogroup Pacman */
+/*@{*/
+
 #ifndef __TILELAYERS_HPP__
 #define __TILELAYERS_HPP__
 
@@ -51,3 +54,6 @@ class TileLayerBackground : public QGAMES::TileLayer2D
 };
 
 #endif
+  
+// End of the file
+/*@}*/

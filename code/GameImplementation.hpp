@@ -1,3 +1,6 @@
+/** \addtogroup Pacman */
+/*@{*/
+
 #ifndef __GAMEIMPLEMENTATION_HPP__
 #define __GAMEIMPLEMENTATION_HPP__
 
@@ -13,5 +16,7 @@ class GameImplementation : public SDLGame
 	virtual QGAMES::InputHandler* createInputHandler ();
 };
 
-
 #endif
+  
+// End of the file
+/*@}*/

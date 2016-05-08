@@ -1,3 +1,6 @@
+/** \addtogroup Pacman */
+/*@{*/
+
 #ifndef __SCENES_HPP__
 #define __SCENES_HPP__
 
@@ -24,3 +27,6 @@ class ScenePacman : public QGAMES::Scene
 };
 
 #endif
+  
+// End of the file
+/*@}*/

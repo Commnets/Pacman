@@ -1,3 +1,6 @@
+/** \addtogroup Pacman */
+/*@{*/
+
 #ifndef __WORLDSBUILDER_HPP__
 #define __WORLDSBUILDER_HPP__
 
@@ -19,3 +22,6 @@ class WorldsBuilder : public QGAMES::WorldBuilder
 
 
 #endif
+  
+// End of the file
+/*@}*/

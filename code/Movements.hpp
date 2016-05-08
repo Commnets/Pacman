@@ -1,3 +1,6 @@
+/** \addtogroup Pacman */
+/*@{*/
+
 #ifndef __MOVEMENTS_HPP__
 #define __MOVEMENTS_HPP__
 
@@ -156,3 +159,6 @@ class MovementEnteringThePen : public PacmanEntityMovement
 };
 
 #endif
+  
+// End of the file
+/*@}*/
