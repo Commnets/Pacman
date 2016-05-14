@@ -16,7 +16,7 @@
 #define __MAPSFILE__					"maps.xml"
 
 // Main parameters of the screen game...
-#define __GAMESNAME__					"Pacman ICF"
+#define __GAMESNAME__					"ICF Pacman Game"
 #define __SCREENXPOS__					400
 #define __SCREENYPOS__					50
 #define __SCREENWIDTH__					608
