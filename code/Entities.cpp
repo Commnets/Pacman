@@ -200,20 +200,23 @@ void PacmanMonster::drawOn (QGAMES::Screen* s, const QGAMES::Position& p)
 }
 
 // ---
-void PacmanMonster::whenCollisionWith (QGAMES::Tile* t, QGAMES::TileLayer* l)
+void PacmanMonster::whenCollisionWith (const QGAMES::Tiles& t, QGAMES::TileLayer* l)
 {
+	QGAMES::Tile* rT = QGAMES::NullTile::_nullTile;
+	if (!t.empty ()) rT = t [(int) t.size () - 1];
+
 	// The collision has been with a portal
 	// Then it is necessary to look for the other one...
-	if (t -> type () == __TILEGATE)
+	if (rT -> type () == __TILEGATE)
 	{
 		// The collision with portal 1 has to happen while going to the left...
 		// Otherhise it would be valid at all...
-		if (t -> numberFrame () == __PORTALGATE1 && orientation () == General::_e._left)
+		if (rT -> numberFrame () == __PORTALGATE1 && orientation () == General::_e._left)
 			notify (QGAMES::Event (__ENTERPORTAL1, this));
 		else
 		// And the collision with portal 2 has to happen while going to the right...
 		// Otherhise it would be valid at all...
-		if (t -> numberFrame () == __PORTALGATE2 && orientation () == General::_e._right)
+		if (rT -> numberFrame () == __PORTALGATE2 && orientation () == General::_e._right)
 			notify (QGAMES::Event (__ENTERPORTAL2, this));
 	}
 }
@@ -542,37 +545,40 @@ void Pacman::initialize ()
 }
 
 // ---
-void Pacman::whenCollisionWith (QGAMES::Tile* t, QGAMES::TileLayer* l)
+void Pacman::whenCollisionWith (const QGAMES::Tiles& t, QGAMES::TileLayer* l)
 {
+	QGAMES::Tile* rT = QGAMES::NullTile::_nullTile;
+	if (!t.empty ()) rT = t [(int) t.size () - 1];
+
 	// Collision with a ball...
 	// It could be a normal one, or a ball with power...
-	if (t -> type () == __TILEBALL)
+	if (rT -> type () == __TILEBALL)
 	{
-		if (t -> numberFrame () == __BALLFRAME) // A normal ball has been eated...
-			notify (QGAMES::Event (__BALLEATED, t));
-		if (t -> numberFrame () == __SUPERBALLFRAME) // The pwer ball has been eated...
-			notify (QGAMES::Event (__SUPERBALLEATED, t));
+		if (rT -> numberFrame () == __BALLFRAME) // A normal ball has been eated...
+			notify (QGAMES::Event (__BALLEATED, rT));
+		if (rT -> numberFrame () == __SUPERBALLFRAME) // The pwer ball has been eated...
+			notify (QGAMES::Event (__SUPERBALLEATED, rT));
 	}
 	else
 	// The collision has been with the fruit...
-	if (t -> type () == __TILEFRUIT)
+	if (rT -> type () == __TILEFRUIT)
 	{
-		if (t -> numberFrame () != __FRUITFRAMEEMPTY)
-			notify (QGAMES::Event (__FRUITEATEN, t));
+		if (rT -> numberFrame () != __FRUITFRAMEEMPTY)
+			notify (QGAMES::Event (__FRUITEATEN, rT));
 	}
 	// The collision has been with a portal
 	// Then it is necessary to look for the other one...
 	else
-	if (t -> type () == __TILEGATE)
+	if (rT -> type () == __TILEGATE)
 	{
 		// The collision with portal 1 has to happen while going to the left...
 		// Otherhise it would be valid at all...
-		if (t -> numberFrame () == __PORTALGATE1 && orientation () == General::_e._left)
+		if (rT -> numberFrame () == __PORTALGATE1 && orientation () == General::_e._left)
 			notify (QGAMES::Event (__ENTERPORTAL1, this));
 		else
 		// And the collision with portal 2 has to happen while going to the right...
 		// Otherhise it would be valid at all...
-		if (t -> numberFrame () == __PORTALGATE2 && orientation () == General::_e._right)
+		if (rT -> numberFrame () == __PORTALGATE2 && orientation () == General::_e._right)
 			notify (QGAMES::Event (__ENTERPORTAL2, this));
 	}
 }

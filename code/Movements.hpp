@@ -28,6 +28,9 @@ class PacmanEntityMovement : public QGAMES::Movement
 							{ return (_speed); }
 	void setSpeed (int s) ;
 
+	virtual QGAMES::Vector acceleration () const
+							{ return (QGAMES::Vector::_cero); }
+
 	virtual void initialize ();
 
 	/** The move method has been programming to call moveOne
@@ -59,6 +62,8 @@ class MovementIntoThePen : public PacmanEntityMovement
 	virtual Movement* clone ();
 
 	virtual QGAMES::Vector direction () const;
+	virtual QGAMES::Vector acceleration () const
+							{ return (QGAMES::Vector::_cero); }
 
 	virtual void initialize ();
 
