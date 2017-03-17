@@ -162,7 +162,7 @@ QGAMES::FormBuilder* PacmanGame::createFormBuilder ()
 // ---
 QGAMES::ObjectBuilder* PacmanGame::createObjectBuilder ()
 { 
-	return (new QGAMES::ObjectBuilder (std::string (__OBJECTSFILE__))); 
+	return (new QGAMES::ObjectBuilder (std::string (__OBJECTSFILE__), formBuilder ())); 
 }
 
 // ---
