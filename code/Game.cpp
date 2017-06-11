@@ -10,6 +10,7 @@
 #include "InputHandler.hpp"
 #include "General.hpp"
 #include "Defs.hpp"
+#include <Common/resourcesreader.hpp>
 #include <SDL/sdlformbuilder.hpp>
 #include <SDL/sdlsoundbuilder.hpp>
 #include <iostream>
@@ -35,7 +36,13 @@ PacmanGame::PacmanGame ()
 		  _secondForFruit (0),
 		  _fruitShown (false)
 {
-	// Nothing else to do so far...
+#ifdef NDEBUG
+	// If the data parameter exists, then changes the default temporal file...
+	// It makes sen se only when running release version of the app!
+	if (dynamic_cast <QGAMES::InZipResourceReader*> (QGAMES::ResourceReader::resourceReader ()) != NULL)
+		((QGAMES::InZipResourceReader*) QGAMES::ResourceReader::resourceReader ()) -> 
+			setTempLocation (parameter (std::string (__GAME_DATADIRPROPERTYNAME__)));
+#endif
 }
 
 // ---
@@ -196,6 +203,7 @@ QGAMES::Screens PacmanGame::createScreens ()
 	QGAMES::Screens r;
 	QGAMES::Screen* scr = new SDLScreen (__GAMESNAME__, 
 		 QGAMES::Position (0,0), __SCREENWIDTH__, __SCREENHEIGHT__, __SCREENXPOS__, __SCREENYPOS__);
+	scr -> windowAtCenter ();
 	r.insert (QGAMES::Screens::value_type (__QGAMES_MAINSCREEN__, scr));
 	return (r); 
 }

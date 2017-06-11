@@ -120,7 +120,8 @@ class PacmanMonster : public PacmanArtist
 	virtual void drawOn (QGAMES::Screen* s, 
 		const QGAMES::Position& p = QGAMES::Position::_noPoint);
 
-	virtual void whenCollisionWith (const QGAMES::Tiles& t, QGAMES::TileLayer* l = NULL);
+	virtual void whenCollisionWith (const QGAMES::Tiles& t, 
+		QGAMES::ArtistInATiledMap::TilePosition tP, QGAMES::TileLayer* l = NULL);
 
 	protected:
 	QGAMES::Vector nextMove ();
@@ -164,7 +165,8 @@ class Pacman : public PacmanArtist
 
 	virtual void initialize ();
 
-	virtual void whenCollisionWith (const QGAMES::Tiles& t, QGAMES::TileLayer* l = NULL);
+	virtual void whenCollisionWith (const QGAMES::Tiles& t, 
+		QGAMES::ArtistInATiledMap::TilePosition tP, QGAMES::TileLayer* l = NULL);
 };
 
 /** Blinky: The red monster. */

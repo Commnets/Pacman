@@ -200,7 +200,8 @@ void PacmanMonster::drawOn (QGAMES::Screen* s, const QGAMES::Position& p)
 }
 
 // ---
-void PacmanMonster::whenCollisionWith (const QGAMES::Tiles& t, QGAMES::TileLayer* l)
+void PacmanMonster::whenCollisionWith (const QGAMES::Tiles& t, 
+	QGAMES::ArtistInATiledMap::TilePosition tP, QGAMES::TileLayer* l)
 {
 	QGAMES::Tile* rT = QGAMES::NullTile::_nullTile;
 	if (!t.empty ()) rT = t [(int) t.size () - 1];
@@ -545,7 +546,8 @@ void Pacman::initialize ()
 }
 
 // ---
-void Pacman::whenCollisionWith (const QGAMES::Tiles& t, QGAMES::TileLayer* l)
+void Pacman::whenCollisionWith (const QGAMES::Tiles& t, 
+	QGAMES::ArtistInATiledMap::TilePosition tP, QGAMES::TileLayer* l)
 {
 	QGAMES::Tile* rT = QGAMES::NullTile::_nullTile;
 	if (!t.empty ()) rT = t [(int) t.size () - 1];
