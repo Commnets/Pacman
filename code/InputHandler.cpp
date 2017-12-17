@@ -3,30 +3,6 @@
 #include "Entities.hpp"
 #include "General.hpp"
 #include "Defs.hpp"
-#include <Arcade/arcadegame.hpp>
-#include <iostream>
-
-// ---
-void InputHandler::treatKeyboardStatus (const unsigned __int8* k)
-{
-	if (_game -> activeState () -> type () == __GAMESTATEPLAYING)
-	{
-		// If the device to control pacman is the joystick, nothing to do here...
-		// Keyboard and joystick can not be active at the same time when playing
-		// The reason is, no action in any of them generates a no movement of the pacman
-		// This method is call after processing any event, including keyboard events
-		// So, if the joystick is being used to move the character, and a movement is generated
-		// when the system enters this method, and the keyboard is not in use, the movement finishes...
-		if (_joystick)
-			return; 
-
-		if (k [__PACMANRIGHT]) pacmanRight ();
-		else if (k [__PACMANLEFT]) pacmanLeft ();
-		else if (k [__PACMANDOWN]) pacmanDown ();
-		else if (k [__PACMANUP]) pacmanUp ();
-		// If no key is pressed the character stops!
-	}
-}
 
 // ---
 void InputHandler::onJoystickAxisMoveEvent (QGAMES::JoystickMovementEventData* dt)
@@ -64,7 +40,7 @@ void InputHandler::onJoystickAxisMoveEvent (QGAMES::JoystickMovementEventData* d
 				_mY = 0;
 				if (dt -> _deadLine > 0)
 				{
-					if (dt -> _deadLine > (maxPosJoystick (dt -> _numberAxis) / 4))
+					if (dt -> _deadLine > (game () -> inputHandler () -> maxPosJoystick (dt -> _numberAxis) / 4))
 						_mX += (_mX < 1) ? 1 : 0;
 					else
 						_mX -= (_mX > 0) ? 1 : 0;
@@ -72,7 +48,7 @@ void InputHandler::onJoystickAxisMoveEvent (QGAMES::JoystickMovementEventData* d
 				else
 				if (dt -> _deadLine < 0)
 				{
-					if (dt -> _deadLine < (minPosJoystick (dt -> _numberAxis) / 4))
+					if (dt -> _deadLine < (game () -> inputHandler () -> minPosJoystick (dt -> _numberAxis) / 4))
 						_mX += (_mX > -1) ? -1 : 0;
 					else
 						_mX -= (_mX < 0) ? -1 : 0;
@@ -85,7 +61,7 @@ void InputHandler::onJoystickAxisMoveEvent (QGAMES::JoystickMovementEventData* d
 				_mX = 0;
 				if (dt -> _deadLine > 0)
 				{
-					if (dt -> _deadLine > (maxPosJoystick (dt -> _numberAxis) / 4))
+					if (dt -> _deadLine > (game () -> inputHandler () -> maxPosJoystick (dt -> _numberAxis) / 4))
 						_mY += (_mY < 1) ? 1 : 0;
 					else
 						_mY -= (_mY > 0) ? 1 : 0;
@@ -93,7 +69,7 @@ void InputHandler::onJoystickAxisMoveEvent (QGAMES::JoystickMovementEventData* d
 				else
 				if (dt -> _deadLine < 0)
 				{
-					if (dt -> _deadLine < (minPosJoystick (dt -> _numberAxis) / 4))
+					if (dt -> _deadLine < (game () -> inputHandler () -> minPosJoystick (dt -> _numberAxis) / 4))
 						_mY += (_mY > -1) ? -1 : 0;
 					else
 						_mY -= (_mY < 0) ? -1 : 0;
@@ -118,7 +94,7 @@ void InputHandler::onJoystickAxisMoveEvent (QGAMES::JoystickMovementEventData* d
 				// Just if is not already changing! (see declaration of GameStateInitial class).
 				if (dt -> _deadLine > 0)
 				{
-					if (dt -> _deadLine > (maxPosJoystick (dt -> _numberAxis) / 4))
+					if (dt -> _deadLine > (game () -> inputHandler () -> maxPosJoystick (dt -> _numberAxis) / 4))
 						_dJ += (_dJ < 1) ? 1 : 0;
 					else
 						_dJ -= (_dJ > 0) ? 1 : 0;
@@ -126,7 +102,7 @@ void InputHandler::onJoystickAxisMoveEvent (QGAMES::JoystickMovementEventData* d
 				else
 				if (dt -> _deadLine < 0)
 				{
-					if (dt -> _deadLine < (minPosJoystick (dt -> _numberAxis) / 4))
+					if (dt -> _deadLine < (game () -> inputHandler () -> minPosJoystick (dt -> _numberAxis) / 4))
 						_dJ += (_dJ > -1) ? -1 : 0;
 					else
 						_dJ -= (_dJ < 0) ? -1 : 0;
@@ -148,7 +124,7 @@ void InputHandler::onJoystickAxisMoveEvent (QGAMES::JoystickMovementEventData* d
 				// Just if is not already changing! (see declaration of GameStateInitial class).
 				if (dt -> _deadLine > 0)
 				{
-					if (dt -> _deadLine > (maxPosJoystick (dt -> _numberAxis) / 4))
+					if (dt -> _deadLine > (game () -> inputHandler () -> maxPosJoystick (dt -> _numberAxis) / 4))
 						_dJ += (_dJ < 1) ? 1 : 0;
 					else
 						_dJ -= (_dJ > 0) ? 1 : 0;
@@ -156,7 +132,7 @@ void InputHandler::onJoystickAxisMoveEvent (QGAMES::JoystickMovementEventData* d
 				else
 				if (dt -> _deadLine < 0)
 				{
-					if (dt -> _deadLine < (minPosJoystick (dt -> _numberAxis) / 4))
+					if (dt -> _deadLine < (game () -> inputHandler () -> minPosJoystick (dt -> _numberAxis) / 4))
 						_dJ += (_dJ > -1) ? -1 : 0;
 					else
 						_dJ -= (_dJ < 0) ? -1 : 0;
@@ -210,7 +186,7 @@ void InputHandler::onKeyboardEvent (QGAMES::KeyboardEventData* dt)
 		}
 	}
 	else
-		_lastKey = dt -> _key;
+		_lastKey = dt -> _internalCode;
 
 	if (pKey)
 	{
@@ -264,17 +240,17 @@ void InputHandler::onMouseButtonEvent (QGAMES::MouseButtonEventData* dt)
 	{
 
 		case __GAMESTATEINITIAL:
-			if (dt -> _button == SDL_BUTTON_LEFT && !dt -> _on) // To select one option...
+			if (dt -> _button == QGAMES::MouseButtonCode::QGAMES_BUTTONLEFT && !dt -> _on) // To select one option...
 				((GameStateInitial*) _game -> activeState ()) -> optionSelected ();
 			break;
 
 		case __GAMESTATEPLAYING:
-			if (dt -> _button == SDL_BUTTON_LEFT && !dt -> _on) // To pause / continue the game...
+			if (dt -> _button == QGAMES::MouseButtonCode::QGAMES_BUTTONLEFT && !dt -> _on) // To pause / continue the game...
 				_game -> isGamePaused () ? _game -> continueGame () : _game -> pauseGame ();
 			break;
 
 		case __GAMESTATESEESCORES:
-			if (dt -> _button == SDL_BUTTON_LEFT && !dt -> _on) // To return to the rpevious state...
+			if (dt -> _button == QGAMES::MouseButtonCode::QGAMES_BUTTONLEFT && !dt -> _on) // To return to the rpevious state...
 				((GameStateSeeScore*) _game -> activeState ()) -> setWantToExit (true);
 			break;
 
@@ -284,26 +260,47 @@ void InputHandler::onMouseButtonEvent (QGAMES::MouseButtonEventData* dt)
 }
 
 // ---
+void InputHandler::onKeyboardStatus (const std::vector <bool>& kS)
+{
+	if (_game -> activeState () -> type () == __GAMESTATEPLAYING)
+	{
+		// If the device to control pacman is the joystick, nothing to do here...
+		// Keyboard and joystick can not be active at the same time when playing
+		// The reason is, no action in any of them generates a no movement of the pacman
+		// This method is call after processing any event, including keyboard events
+		// So, if the joystick is being used to move the character, and a movement is generated
+		// when the system enters this method, and the keyboard is not in use, the movement finishes...
+		if (_joystick)
+			return; 
+
+		if (kS [__PACMANRIGHT]) pacmanRight ();
+		else if (kS [__PACMANLEFT]) pacmanLeft ();
+		else if (kS [__PACMANDOWN]) pacmanDown ();
+		else if (kS [__PACMANUP]) pacmanUp ();
+		// If no key is pressed the character stops!
+	}
+}
+
+// ---
 void InputHandler::manakeKeyOnSelectionState (int k)
 {
-	if (k == SDL_SCANCODE_RETURN ||
-		k == SDL_SCANCODE_RETURN2)
+	if (k == QGAMES::KeyCode::QGAMES_RETURN)
 	{
 		((GameStateInitial*) _game -> activeState ()) -> optionSelected ();
-		clearPendingEvents ();
+		game () -> inputHandler () -> clearPendingEvents ();
 	}
 	else
-	if (k == SDL_SCANCODE_DOWN)
+	if (k == QGAMES::KeyCode::QGAMES_DOWN)
 		((GameStateInitial*) _game -> activeState ()) -> nextOption ();
 	else
-	if (k == SDL_SCANCODE_UP)
+	if (k == QGAMES::KeyCode::QGAMES_UP)
 		((GameStateInitial*) _game -> activeState ()) -> previousOption ();
 }
 
 // ---
 void InputHandler::manakeKeyOnPlayingState (int k)
 {
-	if (k == SDL_SCANCODE_Z) // To pause/continue the game...
+	if (k == QGAMES::KeyCode::QGAMES_Z) // To pause/continue the game...
 	{
 		_game -> isGamePaused () ? _game -> continueGame () : _game -> pauseGame ();
 		if (_game -> isGamePaused ()) QGAMES::SoundSystem::system () -> pause ();
@@ -322,16 +319,16 @@ void InputHandler::manakeKeyOnPreludeState (int k)
 void InputHandler::manageKeyOnIntroLetterState (int k)
 {
 	GameStateIntroLetters* s = (GameStateIntroLetters*) _game -> activeState ();
-	if (k == SDL_SCANCODE_RIGHT) s -> nextLetter ();
-	else if (k == SDL_SCANCODE_LEFT) s -> previousLetter ();
-	else if (k == SDL_SCANCODE_RETURN || k == SDL_SCANCODE_RETURN2) s -> letterSelected ();
+	if (k == QGAMES::KeyCode::QGAMES_RIGHT) s -> nextLetter ();
+	else if (k == QGAMES::KeyCode::QGAMES_LEFT) s -> previousLetter ();
+	else if (k == QGAMES::KeyCode::QGAMES_RETURN) s -> letterSelected ();
 }
 
 // ---
 void InputHandler::manageKeyOnSeeScoreState (int k)
 {
 	GameStateSeeScore* s = (GameStateSeeScore*) _game -> activeState ();
-	if (k == SDL_SCANCODE_RETURN || k == SDL_SCANCODE_RETURN2) s -> setWantToExit (true);
+	if (k == QGAMES::KeyCode::QGAMES_RETURN) s -> setWantToExit (true);
 }
 
 // ---

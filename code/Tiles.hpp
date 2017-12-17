@@ -4,9 +4,9 @@
 #ifndef __TILES_HPP__
 #define __TILES_HPP__
 
-#include <Arcade/tile.hpp>
 #include "Tiles.hpp"
 #include "Defs.hpp"
+#include <Arcade/arcadeinclude.hpp>
 
 /** Tile defining the background of the game. */
 class TileBackground : public QGAMES::Tile

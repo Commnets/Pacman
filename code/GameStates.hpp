@@ -4,10 +4,10 @@
 #ifndef __GAMESTATES_HPP__
 #define __GAMESTATES_HPP__
 
-#include <Common/gamestate.hpp>
 #include "Worlds.hpp"
 #include "Maps.hpp"
 #include "Defs.hpp"
+#include <Arcade/arcadeinclude.hpp>
 
 class Pacman;
 class Blinky;

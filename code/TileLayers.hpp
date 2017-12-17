@@ -4,17 +4,17 @@
 #ifndef __TILELAYERS_HPP__
 #define __TILELAYERS_HPP__
 
-#include <Arcade/layer.hpp>
 #include "Defs.hpp"
+#include <Arcade/arcadeinclude.hpp>
 
 /** A layer representing the maze, and the thing in it ready to be eaten. */
-class TileLayerMaze : public QGAMES::TileLayer2D
+class TileLayerMaze : public QGAMES::TileLayer
 {
 	public:
 	TileLayerMaze (int id, const std::string& n, const QGAMES::Tiles& t, 
-		QGAMES::Map* m, QGAMES::TileLayer2D::Orientation o,
+		QGAMES::Map* m, QGAMES::TileLayer::VisualOrientation o,
 		const QGAMES::LayerProperties p = QGAMES::LayerProperties ())
-		: QGAMES::TileLayer2D (id, n, t, m, o, p),
+		: QGAMES::TileLayer (id, n, t, m, o, p),
 		  _blink (false)
 							{ }
 
@@ -36,13 +36,13 @@ class TileLayerMaze : public QGAMES::TileLayer2D
 };
 
 /** A layer representing the background of the game. */
-class TileLayerBackground : public QGAMES::TileLayer2D
+class TileLayerBackground : public QGAMES::TileLayer
 {
 	public:
 	TileLayerBackground (int id, const std::string& n, const QGAMES::Tiles& t, 
-		QGAMES::Map* m, QGAMES::TileLayer2D::Orientation o,
+		QGAMES::Map* m, QGAMES::TileLayer::VisualOrientation o,
 		const QGAMES::LayerProperties p = QGAMES::LayerProperties ())
-		: QGAMES::TileLayer2D (id, n, t, m, o, p),
+		: QGAMES::TileLayer (id, n, t, m, o, p),
 		  _pos (0),
 		  _direction (1)
 							{ _position = QGAMES::Position::_cero; }

@@ -5,7 +5,7 @@
 #define __MAPS_HPP__
 
 #include "TileLayers.hpp"
-#include <Arcade/map.hpp>
+#include <Arcade/arcadeinclude.hpp>
 
 /** The generic class for a map representing the maze. */
 class MapMaze : public QGAMES::TiledMap
@@ -13,7 +13,7 @@ class MapMaze : public QGAMES::TiledMap
 	public:
 	MapMaze (int c, const QGAMES::Layers& l, int w, int h, int tW, int tH,
 		const QGAMES::MapProperties& p = QGAMES::MapProperties ())
-		: QGAMES::TiledMap (c, l, w, h, tW, tH, p),
+		: QGAMES::TiledMap (c, l, w, h, 0, tW, tH, 0, p),
 		_relevantLayers (),
 		_blink (false)
 							{ }

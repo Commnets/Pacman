@@ -3,7 +3,6 @@
 #include "Maps.hpp"
 #include "General.hpp"
 #include "Game.hpp"
-#include <iostream>
 
 // ---
 PacmanArtist::PacmanArtist (int id, const QGAMES::Forms& f, const QGAMES::Entity::Data& d)
@@ -896,7 +895,7 @@ ScorePoints::~ScorePoints ()
 {
 	for (QGAMES::Entities::iterator i = _entities.begin ();
 			i != _entities.end (); i++)
-		delete (*i).second;
+		delete ((*i).second);
 }
 
 // ---
@@ -920,7 +919,7 @@ void ScorePoints::initialize ()
 	// Clear the previous scores...
 	for (QGAMES::Entities::iterator i = _entities.begin ();
 			i != _entities.end (); i++)
-		delete (*i).second;
+		delete ((*i).second);
 	_entities.clear ();
 
 	// Init the control internal variables...
@@ -1016,7 +1015,7 @@ ScoreLives::~ScoreLives ()
 {
 	for (QGAMES::Entities::iterator i = _entities.begin ();
 			i != _entities.end (); i++)
-		delete (*i).second;
+		delete ((*i).second);
 }
 
 // ---
@@ -1042,7 +1041,7 @@ void ScoreLives::initialize ()
 {
 	for (QGAMES::Entities::iterator i = _entities.begin ();
 			i != _entities.end (); i++)
-		delete (*i).second;
+		delete ((*i).second);
 
 	_lives = _maxLives;
 

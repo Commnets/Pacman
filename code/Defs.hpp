@@ -4,17 +4,6 @@
 #ifndef __DEFS__
 #define __DEFS__
 
-#include <SDL.h>
-
-// Definition files...
-#define __ENTITIESFILE__				"entities.xml"
-#define __MOVEMENTSFILE__				"movements.xml"
-#define __FORMSFILE__					"forms.xml"
-#define __OBJECTSFILE__					"objects.xml"
-#define __SOUNDSFILE__					"sounds.xml"
-#define __WORLDSFILE__					"worlds.xml"
-#define __MAPSFILE__					"maps.xml"
-
 // Main parameters of the screen game...
 #define __GAMESNAME__					"ICF Pacman Game"
 #define __SCREENXPOS__					400
@@ -212,10 +201,10 @@
 #define __CLYDEEATENPOINTS				800
 
 // The keys...
-#define __PACMANLEFT					SDL_SCANCODE_A
-#define __PACMANRIGHT					SDL_SCANCODE_S
-#define __PACMANUP						SDL_SCANCODE_P
-#define __PACMANDOWN					SDL_SCANCODE_L
+#define __PACMANLEFT					QGAMES::KeyCode::QGAMES_A
+#define __PACMANRIGHT					QGAMES::KeyCode::QGAMES_S
+#define __PACMANUP						QGAMES::KeyCode::QGAMES_P
+#define __PACMANDOWN					QGAMES::KeyCode::QGAMES_L
 
 // The events
 // When a normal ball has been eaten...

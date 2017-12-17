@@ -34,7 +34,7 @@ QGAMES::Tile* MapsBuilderAddsOn::createTile (int id, QGAMES::Form* form, int nf,
 
 // ---
 QGAMES::TileLayer* MapsBuilderAddsOn::createTileLayer (int id, const std::string& n, 
-		const QGAMES::Tiles& t, QGAMES::Map* m, QGAMES::TileLayer2D::Orientation o,
+		const QGAMES::Tiles& t, QGAMES::Map* m, QGAMES::TileLayer::VisualOrientation o,
 		const QGAMES::LayerProperties& p)
 {
 	QGAMES::TileLayer* result = NULL;
@@ -64,9 +64,11 @@ QGAMES::ImageLayer* MapsBuilderAddsOn::createImageLayer (int id, const std::stri
 }
 
 // ---
-QGAMES::Map* MapsBuilderAddsOn::createMapObject (int id, const QGAMES::Layers& l, int w, int h, int tW, int tH,
-		const QGAMES::MapProperties& p)
+QGAMES::Map* MapsBuilderAddsOn::createMapObject (int id, const QGAMES::Layers& l, int w, int h, int d, 
+		int tW, int tH, int tD, const QGAMES::MapProperties& p)
 {
+	// The depth is not taken into account as the maze is a 2D maze!
+
 	QGAMES::Map* result = NULL;
 	switch (id)
 	{

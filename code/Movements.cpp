@@ -2,10 +2,6 @@
 #include "Entities.hpp"
 #include "Maps.hpp"
 #include "General.hpp"
-#include <Arcade/map.hpp>
-#include <Common/entity.hpp>
-#include <iostream>
-#include <math.h>
 
 // ---
 PacmanEntityMovement::PacmanEntityMovement (int id, std::map <int, double> v)

@@ -4,8 +4,8 @@
 #ifndef __WORLDS_HPP__
 #define __WORLDS_HPP__
 
-#include <Arcade/world.hpp>
 #include "Defs.hpp"
+#include <Arcade/arcadeinclude.hpp>
 
 /** The world where pacaman game happens. */
 class WorldPacman : public QGAMES::World

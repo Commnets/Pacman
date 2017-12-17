@@ -4,9 +4,8 @@
 #ifndef __MOVEMENTS_HPP__
 #define __MOVEMENTS_HPP__
 
-#include <Common/movement.hpp>
-#include <Arcade/layer.hpp>
 #include "Defs.hpp"
+#include <Arcade/arcadeinclude.hpp>
 
 /** This class represents any movement of the game. 
 	Any movement into the maze should be diver by a class inhereting this one. */

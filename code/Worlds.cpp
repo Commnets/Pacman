@@ -1,8 +1,6 @@
 #include "Worlds.hpp"
 #include "Scenes.hpp"
 #include "Game.hpp"
-#include <Arcade/arcadegame.hpp>
-#include <Arcade/artist.hpp>
 
 // ---
 WorldPacman::WorldPacman (const QGAMES::Scenes& s, const QGAMES::WorldProperties& p)

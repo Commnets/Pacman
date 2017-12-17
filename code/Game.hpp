@@ -4,9 +4,8 @@
 #ifndef __GAME_HPP__
 #define __GAME_HPP__
 
-#include <Arcade/arcadegame.hpp>
-#include "GameImplementation.hpp"
 #include "Entities.hpp"
+#include <Arcade/arcadeinclude.hpp>
 
 /** The pacman game. */
 class PacmanGame : public QGAMES::ArcadeGame
@@ -60,12 +59,9 @@ class PacmanGame : public QGAMES::ArcadeGame
 	QGAMES::Position initialPacmanPosition () const;
 
 	private:
-	virtual QGAMES::FormBuilder* createFormBuilder ();
-	virtual QGAMES::ObjectBuilder* createObjectBuilder ();
 	virtual QGAMES::EntityBuilder* createEntityBuilder ();
 	virtual QGAMES::MovementBuilder* createMovementBuilder ();
-	virtual QGAMES::SoundBuilder* createSoundBuilder ();
-	virtual QGAMES::Timer* createTimer ();
+	virtual QGAMES::InputHandler* createInputHandler ();
 	virtual QGAMES::Screens createScreens ();
 	virtual QGAMES::WorldBuilder* createWorldBuilder ();
 	virtual QGAMES::MapBuilder* createMapBuilder ();

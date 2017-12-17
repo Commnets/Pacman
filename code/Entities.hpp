@@ -4,12 +4,8 @@
 #ifndef __ENTITIES_HPP__
 #define __ENTITIES_HPP__
 
-#include <Common/entity.hpp>
-#include <Arcade/artist.hpp>
 #include "Defs.hpp"
-
-#include <vector>
-#include <list>
+#include <Arcade/arcadeinclude.hpp>
 
 class Pacman;
 class Blinky;

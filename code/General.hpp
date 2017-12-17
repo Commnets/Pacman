@@ -4,8 +4,7 @@
 #ifndef __GENERAL_HPP__
 #define __GENERAL_HPP__
 
-#include <Common/position.hpp>
-#include <vector>
+#include <Arcade/arcadeinclude.hpp>
 
 /** General basic variables of the game. */
 class General

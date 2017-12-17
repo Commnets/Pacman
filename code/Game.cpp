@@ -2,7 +2,6 @@
 #include "EntitiesBuilder.hpp"
 #include "MovementsBuilder.hpp"
 #include "Movements.hpp"
-#include "Timer.hpp"
 #include "MapsBuilder.hpp"
 #include "Maps.hpp"
 #include "WorldsBuilder.hpp"
@@ -10,16 +9,12 @@
 #include "InputHandler.hpp"
 #include "General.hpp"
 #include "Defs.hpp"
-#include <Common/resourcesreader.hpp>
-#include <SDL/sdlformbuilder.hpp>
-#include <SDL/sdlsoundbuilder.hpp>
-#include <iostream>
-#include <fstream>
-#include <math.h>
+#include <graphicsinclude.hpp>
 
 // ---
 PacmanGame::PacmanGame ()
-		: QGAMES::ArcadeGame (new GameImplementation (), QGAMES::Worlds ()),
+		: QGAMES::ArcadeGame (new __QGAMESGRAPHICSLIBRARY_IMPLEMENTATIONCLASS__ (), 
+				QGAMES::Worlds ()),
 		  _points (NULL),
 		  _lives (NULL),
 		  _mode (_NORMAL),
@@ -80,9 +75,9 @@ void PacmanGame::removeScoreObjects ()
 {
 	ArcadeGame::removeScoreObjects ();
 
-	delete _points;
+	delete (_points);
 	_points = NULL;
-	delete _lives;
+	delete (_lives);
 	_lives = NULL;
 }
 
@@ -160,50 +155,32 @@ QGAMES::Position PacmanGame::initialPacmanPosition () const
 }
 
 // ---
-QGAMES::FormBuilder* PacmanGame::createFormBuilder ()
-{ 
-	return (new SDL2DSpriteBuilder (std::string (__FORMSFILE__), 
-		(SDLScreen*) mainScreen ())); 
-}
-
-// ---
-QGAMES::ObjectBuilder* PacmanGame::createObjectBuilder ()
-{ 
-	return (new QGAMES::ObjectBuilder (std::string (__OBJECTSFILE__), formBuilder ())); 
-}
-
-// ---
 QGAMES::EntityBuilder* PacmanGame::createEntityBuilder ()
 { 
-	return (new EntitiesBuilder (__ENTITIESFILE__, 
+	return (new EntitiesBuilder (parameter (__GAME_PROPERTYENTITIESFILE__), 
 		formBuilder (), movementBuilder ())); 
 }
 
 // ---
 QGAMES::MovementBuilder* PacmanGame::createMovementBuilder () 
 { 
-	return (new MovementsBuilder (__MOVEMENTSFILE__)); 
+	return (new MovementsBuilder (parameter (__GAME_PROPERTYMOVEMENTSFILE__))); 
 }
 
 // ---
-QGAMES::SoundBuilder* PacmanGame::createSoundBuilder () 
-{ 
-	return (new SDLSoundBuilder (__SOUNDSFILE__)); 
-}
-
-// ---
-QGAMES::Timer* PacmanGame::createTimer ()
-{ 
-	return (new Timer ()); 
+QGAMES::InputHandler* PacmanGame::createInputHandler ()
+{
+	return (implementation () -> createInputHandler (new InputHandler ()));
 }
 
 // ---
 QGAMES::Screens PacmanGame::createScreens ()
 { 
 	QGAMES::Screens r;
-	QGAMES::Screen* scr = new SDLScreen (__GAMESNAME__, 
-		 QGAMES::Position (0,0), __SCREENWIDTH__, __SCREENHEIGHT__, __SCREENXPOS__, __SCREENYPOS__);
-	scr -> windowAtCenter ();
+	QGAMES::Screen* scr = implementation () -> createScreen (std::string (__GAMESNAME__),
+		QGAMES::Position (0,0), __SCREENWIDTH__, __SCREENHEIGHT__, __SCREENXPOS__, __SCREENYPOS__);
+	assert (scr); // Just in case. It should happen anything but...!
+	scr -> windowAtCenter (); // To center the window...
 	r.insert (QGAMES::Screens::value_type (__QGAMES_MAINSCREEN__, scr));
 	return (r); 
 }
@@ -211,13 +188,13 @@ QGAMES::Screens PacmanGame::createScreens ()
 // ---
 QGAMES::WorldBuilder* PacmanGame::createWorldBuilder ()
 {
-	return (new WorldsBuilder (std::string (__WORLDSFILE__), mapBuilder ()));
+	return (new WorldsBuilder (parameter (__GAME_PROPERTYWORLDSFILE__), mapBuilder ()));
 }
 
 // ---
 QGAMES::MapBuilder* PacmanGame::createMapBuilder ()
 {
-	QGAMES::MapBuilder* result = new QGAMES::MapBuilder (std::string (__MAPSFILE__));
+	QGAMES::MapBuilder* result = new QGAMES::MapBuilder (parameter (__GAME_MAPSOBJECTSFILE__));
 	result -> addAddsOn (new MapsBuilderAddsOn ((QGAMES::Sprite2DBuilder*) (formBuilder ())));
 	return (result);
 }

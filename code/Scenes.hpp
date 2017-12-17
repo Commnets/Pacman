@@ -4,14 +4,14 @@
 #ifndef __SCENES_HPP__
 #define __SCENES_HPP__
 
-#include <Arcade/scene.hpp>
 #include "Defs.hpp"
+#include <Arcade/arcadeinclude.hpp>
 
 /** The scene where pacman game happens. */
 class ScenePacman : public QGAMES::Scene
 {
 	public:
-	ScenePacman (const QGAMES::Maps& m, const QGAMES::Scenes& cn,
+	ScenePacman (const QGAMES::Maps& m, const QGAMES::Scene::Connections& cn,
 		const QGAMES::SceneProperties& p = QGAMES::SceneProperties (),
 		const QGAMES::EntitiesPerLayer& ePL = QGAMES::EntitiesPerLayer ())
 		: QGAMES::Scene (__SCENEPACMAN, m, cn, p, ePL)

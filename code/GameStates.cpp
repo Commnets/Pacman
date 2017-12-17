@@ -77,7 +77,7 @@ void PacmanGameStateLoading::drawOn (QGAMES::Screen* s)
 // ---
 void PacmanGameStateLoading::onExit ()
 {
-	delete _text;
+	delete (_text);
 }
 
 // ---
@@ -137,7 +137,7 @@ void GameStateInitial::optionSelected ()
 		if (++_currentOptionLevel >= __MAXNUMBEROFDIFFICULTYLEVELS)
 			_currentOptionLevel = 0;
 		_options [3] = _optionLevels [_currentOptionLevel];
-		delete _optionGraphics [3];
+		delete (_optionGraphics [3]);
 		_optionGraphics [3] = new PacmanPresentationText (_options [3]);
 		_optionGraphics [3] -> setSpace (0);
 	}
@@ -1269,14 +1269,14 @@ void GameStateIntroLetters::drawOn (QGAMES::Screen* s)
 		PacmanPresentationText* nS = new PacmanPresentationText (_sToAdd);
 		nS -> setSpace (5); 
 		nS -> drawOn (s, oPos);
-		delete nS;
+		delete (nS);
 
 		for (int j = 0; j < 3; j++)
 		{
 			PacmanPresentationText* nT = new PacmanPresentationText (std::string (1, _letters [j]));
 			nT -> setSpace (5); 
 			nT -> drawOn (s, oPos + aTxt + (__BD j * incX));
-			delete nT;
+			delete (nT);
 		}
 	}
 	else
@@ -1289,14 +1289,14 @@ void GameStateIntroLetters::drawOn (QGAMES::Screen* s)
 				PacmanPresentationText* nS = new PacmanPresentationText (_sToAdd);
 				nS -> setSpace (5); 
 				nS -> drawOn (s, oPos);
-				delete nS;
+				delete (nS);
 
 				for (int j = 0; j < 3; j++)
 				{
 					PacmanPresentationText* nT = new PacmanPresentationText (std::string (1, _letters [j]));
 					nT -> setSpace (5); 
 					nT -> drawOn (s, oPos + aTxt + (__BD j * incX));
-					delete nT;
+					delete (nT);
 				}
 
 				oPos += incY;
@@ -1312,14 +1312,14 @@ void GameStateIntroLetters::drawOn (QGAMES::Screen* s)
 			PacmanPresentationText* nS = new PacmanPresentationText (_sToAdd);
 			nS -> setSpace (5); 
 			nS -> drawOn (s, oPos);
-			delete nS;
+			delete (nS);
 
 			for (int j = 0; j < 3; j++)
 			{
 				PacmanPresentationText* nT = new PacmanPresentationText (std::string (1, _letters [j]));
 				nT -> setSpace (5); 
 				nT -> drawOn (s, oPos + aTxt + (__BD j * incX));
-				delete nT;
+				delete (nT);
 			}
 		}
 	}
