@@ -133,7 +133,8 @@ void PacmanGame::setLevel (int l)
 void PacmanGame::setJoystick (bool j)
 {
 	assert (_inputHandler);
-	((InputHandler*) _inputHandler) -> activateJoystick (j);
+	assert (_inputHandler -> behaviour ());
+	((InputHandler*) _inputHandler -> behaviour ()) -> activateJoystick (j);
 }
 
 // ---
