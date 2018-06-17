@@ -79,8 +79,8 @@
 #define __GIANTPACMANFORM__				3
 #define __READYFORM						104
 #define __LETTERSFORM					105
-#define __MAZEFORM						10000
-#define __FRUITSFORM					10001
+#define __MAZEFORM						100000
+#define __FRUITSFORM					100001
 
 // The main number of frames...
 #define __BACKGROUNDFRAME				11 // It referes to the form with the maze parts!
