@@ -154,7 +154,7 @@ class Pacman : public PacmanArtist
 			: PacmanArtist (__ENTITYPACMAN, f, d)
 							{ }
 
-	virtual Entity* clone ()
+	virtual Entity* clone () const
 							{ return (new Pacman (_forms, _data)); }
 	virtual Who whoAreYou () const
 							{ return (_PACMAN); }
@@ -174,7 +174,7 @@ class Blinky : public PacmanMonster
 			: PacmanMonster (__ENTITYBLINKY, f, d)
 							{ }
 
-	virtual Entity* clone ()
+	virtual Entity* clone () const
 							{ return (new Blinky (_forms, _data)); }
 	virtual Who whoAreYou () const
 							{ return (_BLINKY); }
@@ -200,7 +200,7 @@ class Pinky : public PacmanMonster
 			: PacmanMonster (__ENTITYPINKY, f, d)
 							{ }
 
-	virtual Entity* clone ()
+	virtual Entity* clone () const
 							{ return (new Pinky (_forms, _data)); }
 	virtual Who whoAreYou () const
 							{ return (_PINKY); }
@@ -226,7 +226,7 @@ class Inky : public PacmanMonster
 			: PacmanMonster (__ENTITYINKY, f, d)
 							{ }
 
-	virtual Entity* clone ()
+	virtual Entity* clone () const
 							{ return (new Inky (_forms, _data)); }
 	virtual Who whoAreYou () const
 							{ return (_INKY); }
@@ -252,7 +252,7 @@ class Clyde : public PacmanMonster
 			: PacmanMonster (__ENTITYCLYDE, f, d)
 							{ }
 
-	virtual Entity* clone ()
+	virtual Entity* clone () const
 							{ return (new Clyde (_forms, _data)); }
 	virtual Who whoAreYou () const
 							{ return (_CLYDE); }
@@ -276,7 +276,7 @@ class ScoreDigit : public QGAMES::ScoreObject
 		: ScoreObject (cId)
 							{ }
 
-	virtual Entity* clone ();
+	virtual Entity* clone () const;
 };
 
 class ScorePoints : public QGAMES::CompositeEntity
@@ -285,7 +285,7 @@ class ScorePoints : public QGAMES::CompositeEntity
 	ScorePoints ();
 	~ScorePoints ();
 
-	virtual Entity* clone ();
+	virtual Entity* clone () const;
 
 	int score () const
 							{ return (_score); }
@@ -312,7 +312,7 @@ class ScoreLive : public QGAMES::ScoreObject
 		: ScoreObject (cId)
 							{ }
 
-	virtual Entity* clone ();
+	virtual Entity* clone () const;
 };
 
 class ScoreLives : public QGAMES::CompositeEntity
@@ -321,7 +321,7 @@ class ScoreLives : public QGAMES::CompositeEntity
 	ScoreLives ();
 	~ScoreLives ();
 
-	virtual Entity* clone ();
+	virtual Entity* clone () const;
 
 	int lives () const
 							{ return (_lives); }

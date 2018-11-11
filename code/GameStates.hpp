@@ -21,7 +21,7 @@ class PacmanPresentationText : public QGAMES::ScoreObjectText
 	public:
 	PacmanPresentationText (const std::string& t = std::string (__NULL_STRING__));
 
-	virtual Entity* clone ()
+	virtual Entity* clone () const
 							{ return (new PacmanPresentationText (_text)); }
 
 	protected:

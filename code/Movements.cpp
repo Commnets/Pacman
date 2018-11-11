@@ -125,7 +125,7 @@ MovementIntoThePen::MovementIntoThePen (int id, std::map <int, double> v)
 }
 
 // ---
-QGAMES::Movement* MovementIntoThePen::clone ()
+QGAMES::Movement* MovementIntoThePen::clone () const
 {
 	QGAMES::Movement* result = new MovementIntoThePen (_id, _variables);
 	result -> initialize ();
@@ -195,7 +195,7 @@ MovementExitingThePen::MovementExitingThePen (int id, std::map <int, double> v)
 }
 
 // ---
-QGAMES::Movement* MovementExitingThePen::clone ()
+QGAMES::Movement* MovementExitingThePen::clone () const
 {
 	QGAMES::Movement* result = new MovementExitingThePen (_id, _variables);
 	result -> initialize ();
@@ -319,7 +319,7 @@ MovementInTheMaze::MovementInTheMaze (int id, std::map <int, double> v)
 }
 
 // ---
-QGAMES::Movement* MovementInTheMaze::clone ()
+QGAMES::Movement* MovementInTheMaze::clone () const
 {
 	QGAMES::Movement* result = new MovementInTheMaze (_id, _variables); 
 	result -> initialize (); 
@@ -413,7 +413,7 @@ MovementEnteringThePen::MovementEnteringThePen (int id, std::map <int, double> v
 }
 
 // ---
-QGAMES::Movement* MovementEnteringThePen::clone ()
+QGAMES::Movement* MovementEnteringThePen::clone () const
 {
 	QGAMES::Movement* result = new MovementEnteringThePen (_id, _variables);
 	result -> initialize ();

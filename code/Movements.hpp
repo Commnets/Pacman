@@ -58,7 +58,7 @@ class MovementIntoThePen : public PacmanEntityMovement
 	public:
 	MovementIntoThePen (int id, std::map <int, double> v);
 
-	virtual Movement* clone ();
+	virtual Movement* clone () const;
 
 	virtual QGAMES::Vector direction () const;
 	virtual QGAMES::Vector acceleration () const
@@ -87,7 +87,7 @@ class MovementExitingThePen : public PacmanEntityMovement
 	public:
 	MovementExitingThePen (int id, std::map <int, double> v);
 
-	virtual Movement* clone ();
+	virtual Movement* clone () const;
 
 	virtual QGAMES::Vector direction () const;
 
@@ -114,7 +114,7 @@ class MovementInTheMaze : public PacmanEntityMovement
 	public:
 	MovementInTheMaze (int id, std::map <int, double> v);
 
-	virtual Movement* clone ();
+	virtual Movement* clone () const;
 	virtual QGAMES::Vector direction () const
 							{ return (QGAMES::Vector::_cero); }
 
@@ -142,7 +142,7 @@ class MovementEnteringThePen : public PacmanEntityMovement
 	public:
 	MovementEnteringThePen (int id, std::map <int, double> v);
 
-	virtual Movement* clone ();
+	virtual Movement* clone () const;
 
 	virtual QGAMES::Vector direction () const;
 

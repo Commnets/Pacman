@@ -872,7 +872,7 @@ void Clyde::processEvent (const QGAMES::Event& e)
 }
 
 // ---
-QGAMES::Entity* ScoreDigit::clone ()
+QGAMES::Entity* ScoreDigit::clone () const
 {
 	ScoreDigit* result = new ScoreDigit (_id);
 	return (result);
@@ -899,7 +899,7 @@ ScorePoints::~ScorePoints ()
 }
 
 // ---
-QGAMES::Entity* ScorePoints::clone ()
+QGAMES::Entity* ScorePoints::clone () const
 {
 	ScorePoints* result = new ScorePoints ();
 	result -> initialize ();
@@ -996,7 +996,7 @@ void ScorePoints::updatePositions ()
 }
 
 // ---
-QGAMES::Entity* ScoreLive::clone ()
+QGAMES::Entity* ScoreLive::clone () const
 {
 	ScoreLive* result = new ScoreLive (_id);
 	return (result);
@@ -1019,7 +1019,7 @@ ScoreLives::~ScoreLives ()
 }
 
 // ---
-QGAMES::Entity* ScoreLives::clone ()
+QGAMES::Entity* ScoreLives::clone () const
 {
 	ScoreLives* result = new ScoreLives ();
 	result -> initialize ();
