@@ -950,7 +950,7 @@ void ScorePoints::initialize ()
 	for (QGAMES::Entities::iterator i = _entities.begin ();
 			i != _entities.end (); i++)
 	{
-		(*i).second -> setPosition (QGAMES::Position (__BD 42 + (frm -> frameWidth () * counter++),
+		(*i).second -> setPosition (QGAMES::Position (__BD 10 + (frm -> frameWidth () * counter++),
 			__BD (__SCREENHEIGHT__ - frm -> frameHeight () - 10), __BD 0));
 		(*i).second -> setForms (frms);
 		(*i).second -> setCurrentForm (frm -> id ());
@@ -1057,7 +1057,7 @@ void ScoreLives::initialize ()
 			i != _entities.end (); i++)
 	{
 		(*i).second -> setPosition (QGAMES::Vector (__BD 
-			(__SCREENWIDTH__ - (frm -> frameWidth () * (1 + counter++)) + 32),
+			(__SCREENWIDTH__ - (frm -> frameWidth () * (1 + counter++)) - 10),
 				__BD (__SCREENHEIGHT__ - frm -> frameHeight () - 10), __BD 0));
 		(*i).second -> setForms (frms);
 		(*i).second -> setCurrentForm (frm -> id ());
