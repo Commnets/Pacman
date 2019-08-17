@@ -9,11 +9,11 @@
 #include "InputHandler.hpp"
 #include "General.hpp"
 #include "Defs.hpp"
-#include <graphicsinclude.hpp>
+#include <SDL/sdlgame.hpp>
 
 // ---
 PacmanGame::PacmanGame ()
-		: QGAMES::ArcadeGame (new __QGAMESGRAPHICSLIBRARY_IMPLEMENTATIONCLASS__ (), 
+		: QGAMES::ArcadeGame (new SDLGame (/** No FMOD. */), 
 				QGAMES::Worlds ()),
 		  _points (NULL),
 		  _lives (NULL),
